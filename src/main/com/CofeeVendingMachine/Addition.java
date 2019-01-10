@@ -9,7 +9,7 @@ public class Addition implements Product
 
     private String name;
 
-    private Integer maximumUnits;
+    private Integer inventoryCost;
 
     public Addition()
     {
@@ -22,16 +22,16 @@ public class Addition implements Product
      */
     public BigDecimal getPrice()
     {
-        return null;
+        return price;
     }
 
 
     /**
      * @see Product#setPrice(boolean)
      */
-    public void setPrice( boolean price )
+    public void setPrice( BigDecimal price )
     {
-
+        this.price = price;
     }
 
 
@@ -40,7 +40,7 @@ public class Addition implements Product
      */
     public String getName()
     {
-        return null;
+        return name;
     }
 
 
@@ -49,7 +49,7 @@ public class Addition implements Product
      */
     public void setName( String name )
     {
-
+        this.name = name;
     }
 
 
@@ -58,7 +58,7 @@ public class Addition implements Product
      */
     public Integer getInvetoryCost()
     {
-        return null;
+        return inventoryCost;
     }
 
 }
