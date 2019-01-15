@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 
-public class OrderedProduct implements Product
+public class OrderedProduct
 {
 
     private Beverage beverage;
@@ -43,7 +43,7 @@ public class OrderedProduct implements Product
     /**
      * @see Product#setPrice(boolean)
      */
-    public void setPrice( boolean price )
+    public void setPrice( BigDecimal price )
     {
 
     }
@@ -68,9 +68,9 @@ public class OrderedProduct implements Product
 
 
     /**
-     * @see Product#getInvetoryCost()
+     * @see Product#getInventoryCost()
      */
-    public Integer getInvetoryCost()
+    public Integer getInventoryCost()
     {
         return null;
     }

@@ -2,6 +2,10 @@ package com.CofeeVendingMachine;
 
 import java.math.BigDecimal;
 
+/**
+ * This class represents a beverage that can be ordered in the coffee vending
+ * machine.
+ */
 public class Beverage implements Product
 {
 
@@ -9,57 +13,98 @@ public class Beverage implements Product
 
     private String name;
 
-    private Integer inventoryCost;
-
-    public Beverage()
+    /**
+     * Create a beverage that the customer has to pay for.
+     * @param name The name of the beverage.
+     * @param price The price of the beverage.
+     */
+    public Beverage( String name, BigDecimal price )
     {
+        this.name = name;
+        this.price = price;
+    }
 
+    /**
+     * Create a free beverage.
+     */
+    public Beverage( String name )
+    {
+        this.name = name;
+        this.price = BigDecimal.ZERO;
     }
 
 
     /**
-     * @see Product#getPrice()
+     * Sets the products price.
+     *
+     * @return The products price as a big integer for floating point precession.
      */
+    @Override
     public BigDecimal getPrice()
     {
-        return price;
+        return this.price;
     }
 
-
     /**
-     * @see Product#setPrice(boolean)
+     * Sets the products price by passing a BigDecimal for floating point precession.
+     *
+     * @param price The price of the product.
      */
+    @Override
     public void setPrice( BigDecimal price )
     {
         this.price = price;
     }
 
-
     /**
-     * @see Product#getName()
+     * Sets the products price by passing a integer.
+     *
+     * @param price The price of the product.
      */
-    public String getName()
+    @Override
+    public void setPrice( Integer price )
     {
-
-        return name;
+        this.price = new BigDecimal( price );
     }
 
+    /**
+     * Sets the products price by passing a string that represents a real number.
+     *
+     * @param price The price of the product.
+     */
+    @Override
+    public void setPrice( String price )
+    {
+        this.price = new BigDecimal( price );
+    }
 
     /**
-     * @see Product#setName(String)
+     * Gets the name of the product.
+     *
+     * @return String The name of the product.
      */
+    @Override
+    public String getName()
+    {
+        return this.name;
+    }
+
+    /**
+     * Sets or updates the name of the product.
+     *
+     * @param name String The name of the product.
+     */
+    @Override
     public void setName( String name )
     {
         this.name = name;
     }
 
-
     /**
-     * @see Product#getInvetoryCost()
      */
-    public Integer getInvetoryCost()
+    public Integer getInventoryCost()
     {
-        return inventoryCost;
+        return null;
     }
 
 }

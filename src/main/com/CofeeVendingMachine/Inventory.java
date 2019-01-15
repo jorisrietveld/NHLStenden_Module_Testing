@@ -1,13 +1,16 @@
 package com.CofeeVendingMachine;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class Inventory
 {
 
-    private Map<T, Integer>;
+    private Map<Product, Integer> currentInventory;
 
     public Inventory()
     {
-
+        currentInventory = new LinkedHashMap<>();
     }
 
     public void addProduct( Product product )
