@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
- * This class represents a addition that can be added to a product.
+ * This class represents a addition that can be added to a beverage.
  */
 public class Addition implements Product
 {
@@ -49,40 +49,6 @@ public class Addition implements Product
     }
 
     /**
-     * Sets the products price by passing a BigDecimal for floating point precession.
-     *
-     * @param price The price of the product.
-     */
-    @Override
-    public void setPrice( BigDecimal price )
-    {
-        this.price = price;
-    }
-
-    /**
-     * Sets the products price by passing a integer.
-     *
-     * @param price The price of the product.
-     */
-    @Override
-    public void setPrice( Integer price )
-    {
-        this.price = new BigDecimal( price );
-    }
-
-    /**
-     * Sets the products price by passing a string that represents a real number.
-     *
-     * @param price The price of the product.
-     */
-    @Override
-    public void setPrice( String price )
-    {
-        this.price = new BigDecimal( price );
-
-    }
-
-    /**
      * Gets the name of the product.
      *
      * @return String The name of the product.
@@ -91,17 +57,6 @@ public class Addition implements Product
     public String getName()
     {
         return this.name;
-    }
-
-    /**
-     * Sets or updates the name of the product.
-     *
-     * @param name String The name of the product.
-     */
-    @Override
-    public void setName( String name )
-    {
-        this.name = name;
     }
 
     @Override
