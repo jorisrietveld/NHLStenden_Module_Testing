@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 
 public class CashPayment implements PaymentMethod {
 
-	public CashPayment() {
+	public CashPayment()
+    {
 
 	}
 
