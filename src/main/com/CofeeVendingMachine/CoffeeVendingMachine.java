@@ -20,6 +20,7 @@ public class CoffeeVendingMachine
     public static void main( String[] args ) throws Exception
     {
         CoffeeVendingMachine coffeeVendingMachine = new CoffeeVendingMachine();
+
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         System.out.print("Enter String");
 
@@ -32,6 +33,7 @@ public class CoffeeVendingMachine
         }catch(NumberFormatException nfe){
             System.err.println("Invalid Format!");
         }
+        gsdgsdfgfgh;
     }
 
 
