@@ -16,5 +16,4 @@ public interface PaymentMethod
      * @return The result of the check as a boolean.
      */
     boolean isAvailable();
-
 }

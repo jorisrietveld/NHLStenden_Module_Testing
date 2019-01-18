@@ -26,7 +26,7 @@ public class CashPayment implements PaymentMethod {
 	 * @see PaymentMethod#isAvailable()
 	 */
 	public boolean isAvailable() {
-		return false;
+		return true;
 	}
 
 }
