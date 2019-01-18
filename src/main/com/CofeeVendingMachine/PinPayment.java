@@ -21,7 +21,7 @@ public class PinPayment extends NetworkPayment
     @Override
     public void pay( BigDecimal amount )
     {
-
+        // Do nothing with it it is always fine.
     }
 
     /**
@@ -32,6 +32,6 @@ public class PinPayment extends NetworkPayment
     @Override
     public boolean isAvailable()
     {
-        return false;
+        return this.checkNetworkAvailability();
     }
 }

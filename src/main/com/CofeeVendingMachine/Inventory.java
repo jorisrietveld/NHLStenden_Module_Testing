@@ -24,7 +24,7 @@ public class Inventory
      */
     public Inventory( Map<Product, Integer> initialInventory )
     {
-        currentInventory = initialInventory;
+        currentInventory = new LinkedHashMap<>(initialInventory);
     }
 
     /**
@@ -39,30 +39,23 @@ public class Inventory
     }
 
     /**
-     * @param name The name of the product
+     * @param product The product to check.
      *
-     * @return
+     * @return The current stock in inventory.
      */
-    public int getStockOfProduct( String name )
+    public int getStockOfProduct( Product product )
     {
-        return 0;
+        return currentInventory.getOrDefault( product, 0  );
     }
 
-    public boolean hasProduct( String string )
-    {
-        currentInventory.forEach( (k,v) -> { } );
-    }
-
+    /**
+     * Checks if a product exists in this inventory.
+     * @param product The product to check.
+     * @return The answer of the check.
+     */
     public boolean hasProduct( Product product )
     {
-        AtomicBoolean answer = new AtomicBoolean( false );
-        currentInventory.forEach( (k,v) -> {
-            if( k.getName().equals( product.getName() ))
-            {
-                answer.set( true );
-            }
-        } );
-        return answer.get();
+        return currentInventory.containsKey( product );
     }
 
 }
