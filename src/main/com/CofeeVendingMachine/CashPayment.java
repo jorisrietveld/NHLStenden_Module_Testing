@@ -7,6 +7,7 @@ public class CashPayment implements PaymentMethod {
 	public CashPayment()
     {
 
+
 	}
 
 
@@ -15,8 +16,9 @@ public class CashPayment implements PaymentMethod {
 	 * 
 	 *  
 	 */
-	public void pay( BigDecimal amount ) {
-
+	public void pay( BigDecimal amount )
+    {
+        // Do nothing with it, always works.
 	}
 
 
@@ -24,7 +26,7 @@ public class CashPayment implements PaymentMethod {
 	 * @see PaymentMethod#isAvailable()
 	 */
 	public boolean isAvailable() {
-		return false;
+		return true;
 	}
 
 }

@@ -19,7 +19,7 @@ public class BitcoinPayment extends NetworkPayment
     @Override
     public void pay( BigDecimal amount )
     {
-
+        // Do nothing with it it always works.
     }
 
     /**

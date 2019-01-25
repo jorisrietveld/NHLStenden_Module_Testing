@@ -77,6 +77,11 @@ public class Beverage implements Product
 
         Beverage beverage = (Beverage) o;
 
+        if ( !this.getPrice().equals( ((Beverage) o).getPrice() ) )
+        {
+            return false;
+        }
+
         if ( this.getName().equals( beverage.getName() ) )
         {
             return true;

@@ -1,7 +1,6 @@
 package com.CofeeVendingMachine;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /**
  * This class represents a addition that can be added to a beverage.
@@ -58,6 +57,40 @@ public class Addition implements Product
     {
         return this.name;
     }
+
+    /**
+     * Custom equals method for comparing by the products name not hashcode.
+     * @param o The object to compare it to.
+     * @return True when the object is the same or has the same name.
+     */
+    @Override
+    public boolean equals( Object o )
+    {
+
+        if ( this == o )
+        {
+            return true;
+        }
+
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        Addition addition = (Addition) o;
+
+        if ( !this.getPrice().equals( ((Addition) o).getPrice() ) )
+        {
+            return false;
+        }
+
+        if ( this.getName().equals( addition.getName() ) )
+        {
+            return true;
+        }
+        return false;
+    }
+
 
     @Override
     public Integer getInventoryCost()
