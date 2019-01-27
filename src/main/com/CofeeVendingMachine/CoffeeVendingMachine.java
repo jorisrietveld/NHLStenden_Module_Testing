@@ -4,10 +4,7 @@ package com.CofeeVendingMachine;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CoffeeVendingMachine
 {
@@ -15,9 +12,9 @@ public class CoffeeVendingMachine
 
     private Inventory inventory;
 
-    private static Map<Product, Integer> getInitialInventory()
+    private static Map<Orderable, Integer> getInitialInventory()
     {
-        Map<Product, Integer> initialInventory = new LinkedHashMap<>();
+        Map<Orderable, Integer> initialInventory = new LinkedHashMap<>();
         initialInventory.put( new Beverage("Coffee", BigDecimal.ZERO ), 100 );
         initialInventory.put( new Beverage("ColdWater", new BigDecimal("12.00") ), 100 );
         initialInventory.put( new Beverage("HotWater", new BigDecimal("6.00") ), 100 );
@@ -32,11 +29,15 @@ public class CoffeeVendingMachine
      */
     public static void main( String[] args ) throws Exception
     {
-
         CoffeeVendingMachine coffeeVendingMachine = new CoffeeVendingMachine( getInitialInventory() );
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        System.out.print("Enter String");
+        System.out.println("-----------[Coffee vending machine]----------");
+        coffeeVendingMachine.inventory.getBeverges()
+                .forEach( (k, b) -> { System.out.format( "[%d] - make a %s", k, )} );
+        System.out.println("-----------[Coffee vending machine]----------");
+        System.out.println("-----------[Coffee vending machine]----------");
+        System.out.println("-----------[Coffee vending machine]----------");
 
         String string = bufferedReader.readLine();
 
@@ -47,6 +48,11 @@ public class CoffeeVendingMachine
         }catch(NumberFormatException nfe){
             System.err.println("Invalid Format!");
         }
+    }
+
+    public void readInput( List<String> expectedResults )
+    {
+
     }
 
 
@@ -64,7 +70,7 @@ public class CoffeeVendingMachine
      * Create a new coffee vending machine instance with some stock in inventory.
      * @param initialInventory The initial stock in inventory.
      */
-    public CoffeeVendingMachine( Map<Product, > initialInventory)
+    public CoffeeVendingMachine( Map<Orderable, Integer> initialInventory )
     {
         this.inventory = new Inventory( initialInventory );
         this.orderedProducts = new HashSet<>( );
@@ -74,7 +80,7 @@ public class CoffeeVendingMachine
      *
      * @param product
      */
-    public void orderProduct( Product product )
+    public void orderProduct( Orderable product )
     {
         //todo check availability
 
@@ -85,7 +91,7 @@ public class CoffeeVendingMachine
         //todo subtract from inventory
     }
 
-    public void addInventory( Product product, Integer amount )
+    public void addInventory( Orderable product, Integer amount )
     {
         inventory.addProduct( product, amount );
     }

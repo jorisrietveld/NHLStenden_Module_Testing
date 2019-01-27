@@ -1,17 +1,29 @@
 package com.CofeeVendingMachine;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class represents a beverage that can be ordered in the coffee vending
  * machine.
  */
-public class Beverage implements Product
+public class Beverage implements Orderable
 {
-
     private BigDecimal price;
 
     private String name;
+
+    private List<Addition> availableAdditions = new ArrayList<>();
+
+    /**
+     * Create a free beverage.
+     */
+    public Beverage( String name )
+    {
+        this( name, BigDecimal.ZERO );
+    }
 
     /**
      * Create a beverage that the customer has to pay for.
@@ -23,16 +35,17 @@ public class Beverage implements Product
     {
         this.name = name;
         this.price = price;
+
     }
 
-    /**
-     * Create a free beverage.
-     */
-    public Beverage( String name )
+    public Beverage(String name, BigDecimal price, Addition ... additions )
     {
         this.name = name;
-        this.price = BigDecimal.ZERO;
+        this.price = price;
+        this.availableAdditions.addAll( Arrays.asList( additions ) );
     }
+
+
 
     /**
      * Sets the products price.
@@ -54,6 +67,17 @@ public class Beverage implements Product
     public String getName()
     {
         return this.name;
+    }
+
+    @Override
+    public List<Addition> getAvailableAdditions()
+    {
+        return this.availableAdditions;
+    }
+
+    public void registerAddition(Addition ... addition)
+    {
+        this.availableAdditions.addAll( Arrays.asList( addition ) );
     }
 
     /**
@@ -88,13 +112,4 @@ public class Beverage implements Product
         }
         return false;
     }
-
-    /**
-     *
-     */
-    public Integer getInventoryCost()
-    {
-        return null;
-    }
-
 }

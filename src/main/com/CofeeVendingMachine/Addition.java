@@ -1,61 +1,42 @@
 package com.CofeeVendingMachine;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class represents a addition that can be added to a beverage.
  */
-public class Addition implements Product
+public class Addition extends Product implements Orderable
 {
+    private Integer quantity;
 
-    private BigDecimal price;
-
-    private String name;
-
-    private Integer inventoryCost;
-
-    /**
-     * Create a addition to a beverage that the customer has to pay for.
-     * @param name The name of the addition.
-     * @param price The price of the addition.
-     */
-    public Addition(String name, BigDecimal price)
+    Addition(String name, BigDecimal price)
     {
-        this.name = name;
-        this.price = price;
+        super(name, price);
+        this.quantity = 1;
     }
 
-    /**
-     * Create a free addition of a beverage.
-     * @param name the name of the addition.
-     */
-    public Addition(String name )
+    Addition(String name, BigDecimal price, Integer quantity)
     {
-        this.name = name;
-        this.price = BigDecimal.ZERO;
+        super(name, price);
+        this.quantity = quantity;
     }
 
+    public Integer getQuantity()
+    {
+        return this.quantity;
+    }
 
-    /**
-     * Sets the products price.
-     *
-     * @return The products price as a big integer for floating point precession.
-     */
+    public Addition updateQuantity(Integer quantity)
+    {
+        return new Addition( this.getName(), this.getPrice(), quantity );
+    }
+
     @Override
-    public BigDecimal getPrice()
+    public List<String> getAvailableAdditions()
     {
-        return this.price;
-    }
-
-    /**
-     * Gets the name of the product.
-     *
-     * @return String The name of the product.
-     */
-    @Override
-    public String getName()
-    {
-        return this.name;
+        return new ArrayList<>(  );
     }
 
     /**
@@ -89,12 +70,5 @@ public class Addition implements Product
             return true;
         }
         return false;
-    }
-
-
-    @Override
-    public Integer getInventoryCost()
-    {
-        return null;
     }
 }
