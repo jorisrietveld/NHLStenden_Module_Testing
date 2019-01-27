@@ -6,12 +6,37 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static java.lang.System.*;
+
 public class CoffeeVendingMachine
 {
+    /**
+     * Constants that define the terminal output formats.
+     */
+    final static private String MENU_OPT_FORMAT =  "-----------[%1$22s]----------";
+    final static private String MENU_HEAD_FORMAT = "[%d] - %s";
+    final static private String MENU_FOOT_FORMAT = "---------------------------------------------";
+
+    /**
+     * The buffer for reading users input.
+     */
+    private BufferedReader bufferedReader = new BufferedReader(new InputStreamReader( in));
+
+    /**
+     * All products that are ordered by customers.
+     */
     private Set<OrderedProduct> orderedProducts;
 
+    /**
+     * The inventory that keeps track of the stock of all ingredients present.
+     */
     private Inventory inventory;
 
+    /**
+     * An initiation method that configures the coffee vending with the default
+     * stock and price configuration.
+     * @return The initial stock.
+     */
     private static Map<Orderable, Integer> getInitialInventory()
     {
         Map<Orderable, Integer> initialInventory = new LinkedHashMap<>();
@@ -31,31 +56,39 @@ public class CoffeeVendingMachine
     {
         CoffeeVendingMachine coffeeVendingMachine = new CoffeeVendingMachine( getInitialInventory() );
 
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("-----------[Coffee vending machine]----------");
-        coffeeVendingMachine.inventory.getBeverges()
-                .forEach( (k, b) -> { System.out.format( "[%d] - make a %s", k, )} );
-        System.out.println("-----------[Coffee vending machine]----------");
-        System.out.println("-----------[Coffee vending machine]----------");
-        System.out.println("-----------[Coffee vending machine]----------");
+
+        out.println("-----------[Coffee vending machine]----------");
+
+
+        for ( Beverage beverage : coffeeVendingMachine.inventory.getBeverges() )
+        {
+            out.format( "[] - make a %s", beverage );
+        }
 
         String string = bufferedReader.readLine();
 
-        System.out.print("Enter Integer:");
+        out.print("Enter Integer:");
 
         try{
             int i = Integer.parseInt(bufferedReader.readLine());
         }catch(NumberFormatException nfe){
-            System.err.println("Invalid Format!");
+            err.println("Invalid Format!");
         }
     }
 
-    public void readInput( List<String> expectedResults )
+    public void printMainMenu()
     {
+        // Todo write out.format( this.MENU_FORMAT) items with the available beverages.
 
+        // Todo write reader that checks for the menu options and calls the order beverage method
+        // Todo     or for the m character for maintenance.
+
+        // todo catch exceptions and print them.
+
+        // todo write exit function
     }
 
-
+    // todo write method that can order a beverage.
 
     /**
      * Create a new coffee vending machine instance.
