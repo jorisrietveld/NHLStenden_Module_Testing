@@ -18,7 +18,7 @@ class InventoryTest
     @BeforeEach
     void setUp()
     {
-        Map<Product, Integer> stock = new LinkedHashMap<>();
+        Map<Orderable, Integer> stock = new LinkedHashMap<>();
 
         stock.put( new Beverage( "Coffee", BigDecimal.ZERO ), 100 );
         stock.put( new Beverage( "HotWater", new BigDecimal("0.50") ), 100 );

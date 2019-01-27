@@ -32,7 +32,7 @@ public class OrderedProduct
 
 
     /**
-     * @see Product#getPrice()
+     * @see Orderable#getPrice()
      */
     public BigDecimal getPrice()
     {
@@ -41,7 +41,7 @@ public class OrderedProduct
 
 
     /**
-     * @see Product#setPrice(boolean)
+     * @see Orderable#setPrice(boolean)
      */
     public void setPrice( BigDecimal price )
     {
@@ -50,7 +50,7 @@ public class OrderedProduct
 
 
     /**
-     * @see Product#getName()
+     * @see Orderable#getName()
      */
     public String getName()
     {
@@ -59,7 +59,7 @@ public class OrderedProduct
 
 
     /**
-     * @see Product#setName(String)
+     * @see Orderable#setName(String)
      */
     public void setName( String name )
     {
@@ -68,7 +68,7 @@ public class OrderedProduct
 
 
     /**
-     * @see Product#getInventoryCost()
+     * @see Orderable#getInventoryCost()
      */
     public Integer getInventoryCost()
     {

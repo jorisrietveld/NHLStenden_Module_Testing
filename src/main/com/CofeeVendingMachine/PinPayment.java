@@ -1,6 +1,8 @@
 package com.CofeeVendingMachine;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.SocketException;
 import java.net.URL;
 
 public class PinPayment extends NetworkPayment
@@ -32,6 +34,13 @@ public class PinPayment extends NetworkPayment
     @Override
     public boolean isAvailable()
     {
-        return this.checkNetworkAvailability();
+        try{
+            return this.checkNetworkAvailability();
+        }
+        catch ( IOException networkError )
+        {
+            // Todo check if this behaviour is correct.
+            return false;
+        }
     }
 }
