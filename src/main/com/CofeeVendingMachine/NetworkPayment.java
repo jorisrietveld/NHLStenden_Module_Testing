@@ -32,7 +32,7 @@ public abstract class NetworkPayment implements PaymentMethod
         this.urlConnection.setDoInput(true); // true indicates the server returns response
     }
 
-    private byte[] preparePostData() throws Exception
+    private byte[] preparePostData()
     {
         StringBuilder postData = new StringBuilder();
 
@@ -104,8 +104,6 @@ public abstract class NetworkPayment implements PaymentMethod
      */
     protected Boolean checkNetworkAvailability()
     {
-        try
-        {
             // Get all the network interfaces that are available on the system.
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while ( interfaces.hasMoreElements() )
@@ -118,11 +116,7 @@ public abstract class NetworkPayment implements PaymentMethod
                     return true;
                 }
             }
-        }
-        catch ( Exception exception )
-        {
-            // Todo log exception.
-        }
+
         return false;
     }
 

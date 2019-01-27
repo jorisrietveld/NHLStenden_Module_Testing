@@ -1,10 +1,17 @@
 package com.CofeeVendingMachine;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
+import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.TerminalScreen;
+import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import com.googlecode.lanterna.terminal.Terminal;
+
+import java.io.*;
 import java.math.BigDecimal;
+import java.net.SocketException;
 import java.util.*;
 
 import static java.lang.System.*;
@@ -17,6 +24,12 @@ public class CoffeeVendingMachine
     final static private String MENU_HEAD_FORMAT = "-----------[%1$22s]----------";
     final static private String MENU_OPT_FORMAT = "[%d] - %s";
     final static private String MENU_FOOT_FORMAT = "---------------------------------------------";
+
+    private Terminal terminal;
+    public Screen screen;
+    private TextGraphics textGraphics;
+
+    private WindowBasedTextGUI textGUI;
 
     /**
      * The buffer for reading users input.
@@ -37,6 +50,10 @@ public class CoffeeVendingMachine
      * If set false it will initiate a shutdown.
      */
     private boolean exitSignal = false;
+    private boolean powerOffSignal = false;
+
+    private static int simulatorExitSignal = 0;
+    private static Exception fatalSimulatorStateException;
 
     /**
      * An initiation method that configures the coffee vending with the default
@@ -60,10 +77,72 @@ public class CoffeeVendingMachine
      *
      * @param args THe commandline arguments passed to this program.
      */
-    public static void main( String ... args )
+    public static void main( String... args )
     {
         CoffeeVendingMachine coffeeVendingMachine = new CoffeeVendingMachine( getInitialInventory() );
-        coffeeVendingMachine.boot();
+        try
+        {
+            while ( !coffeeVendingMachine.powerOffSignal )
+            {
+                out.println( "The system is booting up..." );
+                coffeeVendingMachine.boot();
+                out.println( "Initiating the coffee vending machine..." );
+                coffeeVendingMachine.init();
+                out.println( "Passing control to user-mode..." );
+                coffeeVendingMachine.run();
+            }
+        }
+        catch ( SocketException networkFailure )
+        {
+            // The network can't be reached.
+            simulatorExitSignal = 100;
+            fatalSimulatorStateException = networkFailure;
+        }
+        catch ( IOException inputOutputError )
+        {
+            // There is a general I/O error.
+            simulatorExitSignal = 5;
+            fatalSimulatorStateException = inputOutputError;
+        }
+        catch ( Exception unhandledException )
+        {
+            // State is not recoverable.
+            simulatorExitSignal = 131;
+            fatalSimulatorStateException = unhandledException;
+        }
+        finally
+        {
+            // Check for fatal exceptions that require the coffee vending
+            // machine to terminate.
+            if ( fatalSimulatorStateException != null )
+            {
+                // Notify the user about the fatal error and print detailed
+                // debugging information.
+                StringWriter fatalStackTrace = new StringWriter();
+                PrintWriter printWriter = new PrintWriter( fatalStackTrace );
+                fatalSimulatorStateException.printStackTrace( printWriter );
+
+                out.format( "$1%s %n%n$2%s %n%n--[ Kernel Panic: Fatal Exception ] --",
+                        fatalSimulatorStateException.getLocalizedMessage(),
+                        fatalStackTrace
+                          );
+            }
+
+            // If the screen process still is running terminate it so the we
+            // return to the parent that executed this program.
+            if(coffeeVendingMachine.screen != null) {
+                try {
+                    coffeeVendingMachine.screen.stopScreen();
+                }
+                catch(IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // An shutdown signal or fatal exception has occurred, Terminate the
+        // the coffee vending machine simulator with the appropriate exit signal.
+        exit( simulatorExitSignal );
     }
 
     /**
@@ -87,39 +166,68 @@ public class CoffeeVendingMachine
     }
 
     /**
-     * This function boots the system and handles the main program loop.
+     * This function boots the coffee vending machine to its default state.
      */
     public void boot()
     {
-        try
-        {
-            while ( !this.exitSignal )
-            {
-                this.printMainMenu();
-            }
-            // Todo call a terminate function.
-        }
-        catch ( Exception ex )
-        {
-            out.format( MENU_HEAD_FORMAT, "An exception was thrown" );
-            ex.printStackTrace();
-        }
+        this.inventory = new Inventory( getInitialInventory() );
+        this.orderedProducts = new HashSet<>();
     }
 
-    public void reboot()
+    /**
+     * This function initiates the system that interacts with the user like
+     * creating a terminal for I/O and a appropriate screen for displaying output.
+     */
+    public void init() throws IOException
     {
-        // todo write message to notify the user about the reboot.
-        // todo re-initiate the ordered products and inventory to its defaults
-        // todo      and call the boot function again.
+        // Create a terminal for user IO.
+        this.terminal = new DefaultTerminalFactory().createTerminal();
+
+        // Create a appropriate screen (UnixTerminal, SwingTerminal or even
+        // Telnet terminal) for displaying output to user.
+        this.screen = new TerminalScreen( terminal );
+
+        // Get the graphical user settings for the GUI.
+        this.textGraphics = screen.newTextGraphics();
+
+        // Everything is setup so activate the screen.
+        this.screen.startScreen();
+
+        // Add a gui that supports multiple windows to the screen.
+        this.textGUI = new MultiWindowTextGUI( screen );
+    }
+
+    /**
+     * Reboots the system to its initial state, the inventory and product list
+     * are in memory so get wiped on a reboot.
+     */
+    public void reboot() throws IOException
+    {
+        screen.stopScreen();
+        this.inventory = new Inventory( getInitialInventory() );
+        this.orderedProducts = new HashSet<>();
+        this.boot();
     }
 
     /**
      * This will do a complete shutdown the coffee vending machine, it terminate
      * its self and returnes to the executing terminal.
      */
-    public void shutdown()
+    public void shutdown() throws IOException
     {
-        //
+        if(this.screen != null )
+        {
+            this.screen.stopScreen();
+        }
+    }
+
+    /**
+     * Runs the main program loop of the coffee vending machine. After the
+     * system is initiated by boot
+     */
+    public void run()
+    {
+
     }
 
     public void printMainMenu() throws IOException
@@ -163,6 +271,7 @@ public class CoffeeVendingMachine
 
         }
     }
+
     /**
      * @param product
      */
