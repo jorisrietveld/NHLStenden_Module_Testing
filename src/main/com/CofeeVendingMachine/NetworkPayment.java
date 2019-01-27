@@ -102,7 +102,7 @@ public abstract class NetworkPayment implements PaymentMethod
      *
      * @return The result of the check.
      */
-    protected Boolean checkNetworkAvailability()
+    protected Boolean checkNetworkAvailability() throws IOException
     {
             // Get all the network interfaces that are available on the system.
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();

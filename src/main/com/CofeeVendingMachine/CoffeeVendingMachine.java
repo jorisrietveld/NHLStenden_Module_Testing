@@ -1,9 +1,12 @@
 package com.CofeeVendingMachine;
 
 
+import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -16,6 +19,11 @@ import java.util.*;
 
 import static java.lang.System.*;
 
+/**
+ * This is the main class of the coffee vending machine (simulator) it contains
+ * the main access point and everything needed to simulate a coffee vending
+ * machine like the boot and shutdown methods and methods for user interaction.
+ */
 public class CoffeeVendingMachine
 {
     /**
@@ -92,57 +100,45 @@ public class CoffeeVendingMachine
                 coffeeVendingMachine.run();
             }
         }
+
+        // There are errors with the network of the system.
         catch ( SocketException networkFailure )
         {
-            // The network can't be reached.
             simulatorExitSignal = 100;
             fatalSimulatorStateException = networkFailure;
         }
+
+        // There are unrecoverable input and output errors.
         catch ( IOException inputOutputError )
         {
-            // There is a general I/O error.
             simulatorExitSignal = 5;
             fatalSimulatorStateException = inputOutputError;
         }
+
+        // We don't know what the hell went wrong...
         catch ( Exception unhandledException )
         {
-            // State is not recoverable.
             simulatorExitSignal = 131;
             fatalSimulatorStateException = unhandledException;
         }
         finally
         {
-            // Check for fatal exceptions that require the coffee vending
-            // machine to terminate.
-            if ( fatalSimulatorStateException != null )
+            // If the simulators screen process still is running terminate it
+            if ( coffeeVendingMachine.screen != null )
             {
-                // Notify the user about the fatal error and print detailed
-                // debugging information.
-                StringWriter fatalStackTrace = new StringWriter();
-                PrintWriter printWriter = new PrintWriter( fatalStackTrace );
-                fatalSimulatorStateException.printStackTrace( printWriter );
-
-                out.format( "$1%s %n%n$2%s %n%n--[ Kernel Panic: Fatal Exception ] --",
-                        fatalSimulatorStateException.getLocalizedMessage(),
-                        fatalStackTrace
-                          );
-            }
-
-            // If the screen process still is running terminate it so the we
-            // return to the parent that executed this program.
-            if(coffeeVendingMachine.screen != null) {
-                try {
+                try
+                {
                     coffeeVendingMachine.screen.stopScreen();
                 }
-                catch(IOException e) {
+                catch ( IOException e )
+                {
                     e.printStackTrace();
                 }
             }
-        }
 
-        // An shutdown signal or fatal exception has occurred, Terminate the
-        // the coffee vending machine simulator with the appropriate exit signal.
-        exit( simulatorExitSignal );
+            // The nothing left to do, so initiate the shutdown.
+            coffeeVendingMachine.shutdown();
+        }
     }
 
     /**
@@ -201,24 +197,44 @@ public class CoffeeVendingMachine
      * Reboots the system to its initial state, the inventory and product list
      * are in memory so get wiped on a reboot.
      */
-    public void reboot() throws IOException
+    public void reboot()
     {
-        screen.stopScreen();
-        this.inventory = new Inventory( getInitialInventory() );
-        this.orderedProducts = new HashSet<>();
-        this.boot();
+        try
+        {
+            screen.stopScreen();
+            this.inventory = new Inventory( getInitialInventory() );
+            this.orderedProducts = new HashSet<>();
+            this.boot();
+        }
+        catch ( IOException exception )
+        {
+            simulatorExitSignal = 5;
+            fatalSimulatorStateException = exception;
+        }
     }
 
     /**
      * This will do a complete shutdown the coffee vending machine, it terminate
      * its self and returnes to the executing terminal.
      */
-    public void shutdown() throws IOException
+    public void shutdown()
     {
-        if(this.screen != null )
+        if ( fatalSimulatorStateException != null )
         {
-            this.screen.stopScreen();
+            // Notify the user with debug information.
+            StringWriter fatalStackTrace = new StringWriter();
+            PrintWriter printWriter = new PrintWriter( fatalStackTrace );
+            fatalSimulatorStateException.printStackTrace( printWriter );
+
+            out.format( "$1%s %n%n$2%s %n%n--[ Kernel Panic: Fatal Exception ] --",
+                    fatalSimulatorStateException.getLocalizedMessage(),
+                    fatalStackTrace
+                      );
         }
+
+        // An shutdown signal was triggered, Terminate the coffee vending
+        // machine simulator with the appropriate exit signal.
+        exit( simulatorExitSignal );
     }
 
     /**
@@ -227,11 +243,21 @@ public class CoffeeVendingMachine
      */
     public void run()
     {
-
+        textGraphics.fillRectangle( new TerminalPosition( 1, 1 ), new TerminalSize( 80, 40 ), '#' );
+        textGraphics.putString( new TerminalPosition( 30, 10 ), "Welcome to our coffee vending machine" );
+        // Print the main menu
+        this.initialStartupMode();
     }
 
-    public void printMainMenu() throws IOException
+    public void initialStartupMode()
     {
+        new ActionListDialogBuilder()
+                .setTitle( "==[ Coffee vending machine ]==" )
+                .setDescription( "Please choose one of the following actions:" )
+                .addAction( "Order a beverage.", this::orderBeverageMode )
+                .addAction( "Maintainers mode.", this::maintainersMode )
+                .addAction( "Reboot (Data will be wiped)", this::reboot )
+                .addAction( "Shutdown (exit the simulator)", this::shutdown );/*
         // Print the header of the main menu
         out.format( MENU_HEAD_FORMAT, "Coffee Vending Menu" );
 
@@ -269,7 +295,22 @@ public class CoffeeVendingMachine
         catch ( NumberFormatException ex )
         {
 
-        }
+        }*/
+    }
+
+    public void maintainersMode()
+    {
+
+    }
+
+    public void orderBeverageMode()
+    {
+
+    }
+
+    public void selectAdditionsMode()
+    {
+
     }
 
     /**

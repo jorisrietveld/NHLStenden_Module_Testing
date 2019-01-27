@@ -34,7 +34,7 @@ public class Addition extends Product implements Orderable
     }
 
     @Override
-    public List<String> getAvailableAdditions()
+    public List<Addition> getAvailableAdditions()
     {
         return new ArrayList<>(  );
     }
