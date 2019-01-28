@@ -457,6 +457,7 @@ public class CoffeeVendingMachine
      */
     public void paymentSelectionMode( Beverage beverage )
     {
+        notifyMessage( "Please select a method to pay "+beverage.getPrice()+" euro." );
         ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
 
         for ( PaymentMethod method : this.availablePaymentMethods )
