@@ -189,7 +189,7 @@ public class CoffeeVendingMachine
 
         // Set virtual effects of the terminal
         terminal.setForegroundColor( TextColor.ANSI.GREEN );
-        terminal.setBackgroundColor(TextColor.ANSI.BLACK);
+        terminal.setBackgroundColor( TextColor.ANSI.BLACK );
 
         terminal.enterPrivateMode();
 
@@ -330,38 +330,32 @@ public class CoffeeVendingMachine
     {
         ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder()
                 .setTitle( "==[ Order A Beverage ]==" )
-                .setDescription( "Please select the beverage you want to order:");
+                .setDescription( "Please select the beverage you want to order:" );
 
-        this.inventory.getBeverages().forEach( beverage ->
-                                             );
-        List<Runnable> orders = this.inventory.getBeverages().stream()
-                                                     .map( beverage -> new Runnable(){
-                                                             String string(){
-                                                                 return beverage.getName();
-                                                             }
-
-                                                             @Override
-                                                             public void run()
-                                                             {
-                                                                 orderProduct( beverage );
-                                                             }
-                                                         }
-                                                     });
-
-                .collect( Collectors.toMap( beverage -> () -> orderProduct( beverage), Beverage::getName  )
+        for( Beverage beverage: this.inventory.getBeverages())
+        {
+            menuBuilder.addAction( beverage.getName(), () -> this.orderProduct( beverage ) );
+        }
+                beverage -> { menuBuilder.addAction(
+                        beverage.getName(),
+                        () -> this.orderProduct( beverage ) )
+                });
 
 
-                .<Runnable> map( beverage -> () -> orderProduct( beverage ) )
-                        this.inventory.getBeverages().stream()
+                .collect( Collectors.toMap( beverage -> () -> orderProduct( beverage ), Beverage::getName )
 
-                                .<Runnable> map( beverage -> () -> orderProduct( beverage ) )
-                                      .toArray(  )
+
+            .<Runnable>map( beverage -> () -> orderProduct( beverage ) )
+        this.inventory.getBeverages().stream()
+
+                .<Runnable>map( beverage -> () -> orderProduct( beverage ) )
+                .toArray()
                            );
 
-                this.inventory.getBeverages().stream()
-                        .forEach( b -> b.getName() ); )
+        this.inventory.getBeverages().stream()
+                      .forEach( b -> b.getName() ); )
         Runnable[] orderBeverages = this.inventory.getBeverages().stream()
-                .<Runnable> map( beverage -> () -> orderProduct( beverage ) )
+                .<Runnable>map( beverage -> () -> orderProduct( beverage ) )
                 .collect( Collectors.toCollection() )
 
     }
@@ -374,7 +368,7 @@ public class CoffeeVendingMachine
     /**
      * @param product
      */
-    public static void orderProduct( Orderable product )
+    public void orderProduct( Orderable product )
     {
         //todo check availability
 
