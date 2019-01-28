@@ -11,6 +11,8 @@ import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -353,6 +355,83 @@ public class CoffeeVendingMachine
     {
 
     }
+
+    /**
+     * Enables the maintenance staff to resupply "Units" of a product to the
+     * inventory. It creates number-input dialog asking for the amount.
+     */
+    public void addInventoryMode(Product product)
+    {
+
+    }
+
+    /**
+     * Enables the maintenance staff to add new products to the machines inventory.
+     */
+    public void addNewProduct()
+    {
+
+    }
+
+    /**
+     * Enables the user to select the payment method he or se prefers for
+     * completing his order.
+     */
+    public void paymentSelectionMode()
+    {
+
+    }
+
+    /**
+     * Enables the user to complete him or his order by starting a transaction
+     * between the payment method and vending machine.
+     */
+    public void completeOrderMode(PaymentMethod method)
+    {
+        // Todo switch between cash and networked payments.
+
+        //todo implement a cash payment menu? that counts down and lets the user
+        //      select what coin to use.
+
+        // Todo implement a networked payment menu.
+
+        // Todo Call check availability to check if the payment API is available.
+        //  - print error dialog
+        //  - Do payment and notify the user about the success.
+    }
+
+    /**
+     * Notifies a user about a event.
+     * @param message Info, debug, warnings that are not errors.
+     */
+    public void notifyMessage( String message )
+    {
+        new MessageDialogBuilder()
+                .setTitle("==[ Notice ]==")
+                .setText(message)
+                .addButton( MessageDialogButton.OK )
+                .build()
+                .showDialog(textGUI);
+    }
+
+    /**
+     * Notifies a user about a error occurrence.
+     * @param message Warnings, errors and if unlucky fatal's.
+     */
+    public void errorMessage( String message )
+    {
+        new MessageDialogBuilder()
+                .setTitle("==[ An error occurred ]==")
+                .setText(message)
+                .addButton(MessageDialogButton.Retry)
+                .addButton(MessageDialogButton.Continue)
+                .addButton(MessageDialogButton.Abort )
+                .build()
+                .showDialog(textGUI);
+    }
+
+
+
 
     /**
      * @param product
