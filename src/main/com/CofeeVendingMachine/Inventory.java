@@ -15,25 +15,6 @@ import java.util.stream.Stream;
 public class Inventory
 {
     /**
-     * The amount of units it can store of a product when full.
-     */
-    public static final int MAX_BEVERIGE_QUANTITY = 100;
-    public static final int MAX_ADDITION_QUANTITY = 300;
-
-    /**
-     * The amount of units when it is no longer possible to order a addition.
-     */
-    public static final int MIN_BEVERIGE_QUANTITY = 0;
-    public static final int MIN_ADDITION_QUANTITY = 3;
-
-    /**
-     * When this amount is reached in the inventory it should be noticed that
-     * its almost empty.
-     */
-    public static final int LOW_BEVERAGE_QUANTITY = 10;
-    public static final int LOW_ADDITION_QUANTITY = 50;
-
-    /**
      * The current inventory currently stored in the coffee vending machine.
      */
     private Map<Orderable, Integer> currentInventory;
@@ -97,8 +78,18 @@ public class Inventory
 
     public void fillProduct( Orderable product)
     {
- /*       this.currentInventory.keySet().stream()
-                .anyMatch( k -> k.equals( product ) ).*/
+        if( product instanceof Beverage)
+        {
+            this.currentInventory.put( product, Beverage.MAX_QUANTITY );
+        }
+        else if( product instanceof Addition )
+        {
+            this.currentInventory.put( product, Addition.MAX_QUANTITY );
+        }
+        else
+        {
+           throw new IllegalArgumentException( "Undefined product." );
+        }
     }
     /**
      * Gets a list of all beverages that are available for purchase so we can

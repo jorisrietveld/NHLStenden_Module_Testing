@@ -341,7 +341,7 @@ public class CoffeeVendingMachine
                                      .setDescription( "Please choose one of the following actions:" )
                                      .setCloseAutomaticallyOnAction( true )
                                      /*   .addAction( "Add new inventory.", this::selectInventoryToAddMode )*/
-                                     .addAction( "Resupply the inventory.", this::maintainersMode )
+                                     .addAction( "Resupply the inventory.", this::selectInventoryToAddMode )
                                      /*        .addAction( "Enable/Disable payment methods.", this::maintainersMode )*/
                                      .addAction( "Reboot", this::reboot )
                                      .addAction( "Shutdown (exit the simulator)", this::shutdown )
@@ -422,15 +422,6 @@ public class CoffeeVendingMachine
     }
 
     /**
-     * @param product
-     */
-    public void orderProduct( Orderable product )
-    {
-        // todo store order
-        //todo subtract from inventory
-    }
-
-    /**
      * Prints a product list of all products so the maintainer can choose what
      * products he wants to refill.
      */
@@ -450,16 +441,14 @@ public class CoffeeVendingMachine
                    .showDialog( this.textGUI );
     }
 
-    public void fillInventory( Orderable item )
+    public void fillInventory( Orderable product )
     {
-    }
+        int oldInventory = this.inventory.getStockOfProduct( product );
+        this.inventory.fillProduct( product );
+        int newInventory = this.inventory.getStockOfProduct( product );
 
-    /**
-     * Enables the maintenance staff to add new products to the machines inventory.
-     */
-    public void addNewProduct()
-    {
-
+        this.notifyMessage( String.format( "The the product is refilled from: %d to: %d", oldInventory, newInventory) );
+        this.selectInventoryToAddMode();
     }
 
     /**
@@ -490,16 +479,15 @@ public class CoffeeVendingMachine
      */
     public void completeOrderMode( PaymentMethod method, Beverage beverage )
     {
-        // Todo switch between cash and networked payments.
-
-        //todo implement a cash payment menu? that counts down and lets the user
-        //      select what coin to use.
-
-        // Todo implement a networked payment menu.
-
-        // Todo Call check availability to check if the payment API is available.
-        //  - print error dialog
-        //  - Do payment and notify the user about the success.
+        if( method.isAvailable() )
+        {
+            this.notifyMessage( "Done your: " + beverage.getName() + " will be served shortly." );
+        }
+        else
+        {
+            this.notifyMessage( "The chosen payment method is nog available, Please select a other one." );
+            this.paymentSelectionMode( beverage );
+        }
     }
 
     /**
@@ -516,24 +504,6 @@ public class CoffeeVendingMachine
                 .build()
                 .showDialog( textGUI );
     }
-
-    /**
-     * Notifies a user about a error occurrence.
-     *
-     * @param message Warnings, errors and if unlucky fatal's.
-     */
-    public void errorMessage( String message )
-    {
-        new MessageDialogBuilder()
-                .setTitle( "==[ An error occurred ]==" )
-                .setText( message )
-                .addButton( MessageDialogButton.Retry )
-                .addButton( MessageDialogButton.Continue )
-                .addButton( MessageDialogButton.Abort )
-                .build()
-                .showDialog( textGUI );
-    }
-
 
     public void addInventory( Orderable product, Integer amount )
     {
