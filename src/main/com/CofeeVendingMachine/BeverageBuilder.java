@@ -54,12 +54,7 @@ public class BeverageBuilder extends AbstractProductBuilder<BeverageBuilder, Bev
     public BeverageBuilder updateAddition( Beverage beverage, Addition addition )
     {
         this.buildFrom( beverage );
-        Optional<Addition> original = this.additions.stream()
-                                         .filter( a -> a.getName().equals( addition.getName() ) )
-                                         .findFirst();
-        original.orElseThrow( IllegalArgumentException::new );
-
-        this.additions.remove( original.get() );
+        this.additions.remove( beverage.getAdditions().indexOf( addition ) );
         this.additions.add( addition );
 
         return this;

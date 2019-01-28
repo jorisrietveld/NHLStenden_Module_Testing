@@ -377,16 +377,22 @@ public class CoffeeVendingMachine
      * Creates an action menu for available beverage additions, for the previously
      * chosen beverage.
      *
-     * @param forProduct The product to add the ingredients to.
+     * @param beverage The product to add the ingredients to.
      */
-    public void beverageAdditionsMode( Beverage forProduct )
+    public void beverageAdditionsMode( Beverage beverage )
     {
         ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
 
-        for ( Addition addition : this.inventory.getAdditions( forProduct ) )
+        beverageBuilder.buildFrom( beverage );
+
+        this.inventory.getAdditions( beverage )
+                      .forEach( a -> beverageBuilder.addAddition( a ));
+
+        for ( Addition addition : this.inventory.getAdditions( beverage ) )
         {
-            menuBuilder.addAction( addition.getName(), () -> this.setAdditionStrength( forProduct, addition ) );
+            menuBuilder.addAction( addition.getName(), () -> this.setAdditionStrength( beverageBuilder.build(), addition ) );
         }
+
         menuBuilder.setTitle( "==[ Beverage Customization ]==" )
                    .setDescription( "Add to your beverage:" )
                    .setCloseAutomaticallyOnAction( true )
