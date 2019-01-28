@@ -86,9 +86,16 @@ public class CoffeeVendingMachine
     {
         Map<Orderable, Integer> initialInventory = new LinkedHashMap<>();
         initialInventory.put( new Beverage( "Coffee", BigDecimal.ZERO ), 100 );
-        initialInventory.put( new Beverage( "ColdWater", new BigDecimal( "12.00" ) ), 100 );
-        initialInventory.put( new Beverage( "HotWater", new BigDecimal( "6.00" ) ), 100 );
+        initialInventory.put( new Beverage( "Espresso", new BigDecimal( "0.05" ) ), 100 );
+        initialInventory.put( new Beverage( "Cappucino", new BigDecimal( "0.01" ) ), 100 );
         initialInventory.put( new Beverage( "ChocolateMilk", BigDecimal.ONE ), 100 );
+        initialInventory.put( new Beverage( "HotWater", new BigDecimal( "5.99" ) ), 100 );
+        initialInventory.put( new Beverage( "IrishCoffee", BigDecimal.ZERO ), 100 );
+        initialInventory.put( new Beverage( "LatteMachiatto", new BigDecimal( "1.77" ) ), 100 );
+        initialInventory.put( new Beverage( "ColdWater", new BigDecimal( "12.95" ) ), 100 );
+
+        initialInventory.put( new Addition("Milk", BigDecimal.ZERO), 100);
+        initialInventory.put( new Addition("Sugar", BigDecimal.ZERO), 100);
 
         return initialInventory;
     }
