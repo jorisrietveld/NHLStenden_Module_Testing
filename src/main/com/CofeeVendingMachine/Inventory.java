@@ -1,15 +1,22 @@
 package com.CofeeVendingMachine;
 
+import com.sun.org.apache.xpath.internal.operations.Or;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Inventory
 {
-
     private Map<Orderable, Integer> currentInventory;
+
+    private Predicate<Map.Entry<Orderable, Integer>> inventoryNotEmpty = entry -> entry.getValue() > 0;
 
     /**
      * Initiate a empty inventory.
@@ -50,6 +57,7 @@ public class Inventory
         return currentInventory.getOrDefault( product, 0 );
     }
 
+
     /**
      * Checks if a product exists in this inventory.
      *
@@ -62,19 +70,51 @@ public class Inventory
         return currentInventory.containsKey( product );
     }
 
-    public List<Beverage> getBeverges()
+    public void fillProduct( Orderable product)
     {
-        return this.currentInventory.keySet().stream()
-                                    .filter( p -> p instanceof Beverage )
-                                    .map( p -> (Beverage) p )
+ /*       this.currentInventory.keySet().stream()
+                .anyMatch( k -> k.equals( product ) ).*/
+    }
+    /**
+     * Gets a list of all beverages that are available for purchase so we can
+     * show them to the user.
+     *
+     * @return Currently available beverages.
+     */
+    public List<Beverage> getBeverages()
+    {
+        return this.currentInventory.entrySet().stream()
+                                    .filter( inventoryNotEmpty )
+                                    .filter( e -> e.getKey() instanceof Beverage )
+                                    .map( e -> (Beverage) e.getKey() )
                                     .collect( Collectors.toList() );
     }
 
-    public List<Addition> getAdditions()
+    /**
+     * Gets a list of all beverages that are available for purchase so we can
+     * show them to the user.
+     *
+     * @return Currently available beverages.
+     */
+    public List<Addition> getAdditions( Beverage toBeverage )
     {
-        return this.currentInventory.keySet().stream()
-                                    .filter( p -> p instanceof Addition )
-                                    .map( p -> (Addition) p )
+        return this.currentInventory.entrySet().stream()
+                                    .filter( inventoryNotEmpty )
+                                    .filter( e -> e.getKey() instanceof Addition )
+                                    .map( e -> (Addition) e.getKey() )
+                                    .filter( toBeverage::isCompatible )
                                     .collect( Collectors.toList() );
+    }
+
+    /**
+     * Get a list of all registered products.
+     * @return
+     */
+    public List<Orderable> getAll()
+    {
+        return this.currentInventory.entrySet().stream()
+                                    .map( entry -> entry.getKey() )
+                                    .collect( Collectors.toList() );
+
     }
 }

@@ -3,19 +3,28 @@ package com.CofeeVendingMachine;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
+import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.sun.org.apache.xpath.internal.operations.Or;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.SocketException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.lang.System.*;
 
@@ -34,10 +43,14 @@ public class CoffeeVendingMachine
     final static private String MENU_FOOT_FORMAT = "---------------------------------------------";
 
     private Terminal terminal;
+
     public Screen screen;
+
     private TextGraphics textGraphics;
 
     private WindowBasedTextGUI textGUI;
+
+    private BasicWindow window;
 
     /**
      * The buffer for reading users input.
@@ -179,6 +192,12 @@ public class CoffeeVendingMachine
         // Create a terminal for user IO.
         this.terminal = new DefaultTerminalFactory().createTerminal();
 
+        // Set virtual effects of the terminal
+        terminal.setForegroundColor( TextColor.ANSI.GREEN );
+        terminal.setBackgroundColor( TextColor.ANSI.BLACK );
+
+        terminal.enterPrivateMode();
+
         // Create a appropriate screen (UnixTerminal, SwingTerminal or even
         // Telnet terminal) for displaying output to user.
         this.screen = new TerminalScreen( terminal );
@@ -191,6 +210,11 @@ public class CoffeeVendingMachine
 
         // Add a gui that supports multiple windows to the screen.
         this.textGUI = new MultiWindowTextGUI( screen );
+
+        // Create window to hold the panel
+        this.window = new BasicWindow();
+
+        this.window.setHints(Arrays.asList(Window.Hint.FULL_SCREEN));
     }
 
     /**
@@ -201,6 +225,7 @@ public class CoffeeVendingMachine
     {
         try
         {
+            this.terminal.exitPrivateMode();
             screen.stopScreen();
             this.inventory = new Inventory( getInitialInventory() );
             this.orderedProducts = new HashSet<>();
@@ -241,76 +266,88 @@ public class CoffeeVendingMachine
      * Runs the main program loop of the coffee vending machine. After the
      * system is initiated by boot
      */
-    public void run()
+    public void run() throws IOException
     {
-        textGraphics.fillRectangle( new TerminalPosition( 1, 1 ), new TerminalSize( 80, 40 ), '#' );
-        textGraphics.putString( new TerminalPosition( 30, 10 ), "Welcome to our coffee vending machine" );
+        this.terminal.flush();
+        this.screen.refresh();
+        this.textGUI.waitForWindowToClose( this.window );
+
         // Print the main menu
         this.initialStartupMode();
     }
 
+    /**
+     * This mode enables the user to select between maintainers mode and the
+     * beverage ordering mode.
+     */
     public void initialStartupMode()
     {
-        new ActionListDialogBuilder()
-                .setTitle( "==[ Coffee vending machine ]==" )
-                .setDescription( "Please choose one of the following actions:" )
-                .addAction( "Order a beverage.", this::orderBeverageMode )
-                .addAction( "Maintainers mode.", this::maintainersMode )
-                .addAction( "Reboot (Data will be wiped)", this::reboot )
-                .addAction( "Shutdown (exit the simulator)", this::shutdown );/*
-        // Print the header of the main menu
-        out.format( MENU_HEAD_FORMAT, "Coffee Vending Menu" );
-
-        // Look in the inventory for available beverages and print a menu for the user.
-        List<Beverage> beverges = this.inventory.getBeverges();
-        for ( int i = 0, beverageSize = beverges.size(); i < beverageSize; i++ )
-        {
-            out.format( MENU_OPT_FORMAT, i, beverges.get( i ).getName() );
-        }
-
-        // Add an method to exit or enter maintenance mode.
-        out.format( "%1$s%nType m for maintainable mode or q to exit.%n%1$s", MENU_FOOT_FORMAT );
-
-        String answer = bufferedReader.readLine();
-
-        // The user choose to quit the program so set the exit signal.
-        if ( answer.contains( "q" ) )
-        {
-            this.exitSignal = true;
-            return;
-        }
-
-        // The user wants to access maintainer mode.
-        if ( answer.contains( "m" ) )
-        {
-            // todo write maintainer mode.
-        }
-
-        try
-        {
-            Integer chosenMenuIndex = Integer.parseInt( answer );
-            // todo Check if the index exists.
-            // todo call make beverage with the name of the beverage to make
-        }
-        catch ( NumberFormatException ex )
-        {
-
-        }*/
+        new ActionListDialogBuilder().setTitle( "==[ Coffee vending machine ]==" )
+                                     .setDescription( "Please choose one of the following actions:" )
+                                     .setCloseAutomaticallyOnAction( true )
+                                     .setCanCancel( false )
+                                     .addAction( "Order a beverage.", this::orderBeverageMode )
+                                     .addAction( "Maintainers mode.", this::maintainersMode )
+                                     .build()
+                                     .showDialog( this.textGUI );
     }
 
+    /**
+     * This mode enables the vending machine maintainers to add new products,
+     * resupply, reconfigure, reboot or shutdown the machine.
+     */
     public void maintainersMode()
     {
-
+        new ActionListDialogBuilder().setTitle( "==[ Maintainers Mode ]==" )
+                                     .setDescription( "Please choose one of the following actions:" )
+                                     .setCloseAutomaticallyOnAction( true )
+                                  /*   .addAction( "Add new inventory.", this::selectInventoryToAddMode )*/
+                                     .addAction( "Resupply the inventory.", this::maintainersMode )
+                             /*        .addAction( "Enable/Disable payment methods.", this::maintainersMode )*/
+                                     .addAction( "Reboot", this::reboot )
+                                     .addAction( "Shutdown (exit the simulator)", this::shutdown )
+                                     .build()
+                                     .showDialog( this.textGUI );
     }
 
+    /**
+     * Creates an action menu for selecting a available beverage.
+     */
     public void orderBeverageMode()
     {
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
 
+        for ( Beverage beverage : this.inventory.getBeverages() )
+        {
+            menuBuilder.addAction( beverage.getName(), () -> this.beverageAdditionsMode( beverage ) );
+        }
+        menuBuilder.setTitle( "==[ Order A Beverage ]==" )
+                   .setDescription( "Please select the beverage you want to order:" )
+                   .setCloseAutomaticallyOnAction( true )
+                   .build()
+                   .showDialog( this.textGUI );
     }
 
-    public void selectAdditionsMode()
+    /**
+     * Creates an action menu for available beverage additions, for the previously
+     * chosen beverage.
+     *
+     * @param forProduct The product to add the ingredients to.
+     */
+    public void beverageAdditionsMode( Beverage forProduct )
     {
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
 
+        for ( Addition addition : this.inventory.getAdditions( forProduct ) )
+        {
+            menuBuilder.addAction( addition.getName(), () -> this.orderProduct( addition ) );
+        }
+        menuBuilder.setTitle( "==[ Beverage Customization ]==" )
+                   .setDescription( "Add to your beverage:" )
+                   .setCloseAutomaticallyOnAction( true )
+                   .addAction( "Go back to the previous menu", this::initialStartupMode )
+                   .build()
+                   .showDialog( this.textGUI );
     }
 
     /**
@@ -318,14 +355,99 @@ public class CoffeeVendingMachine
      */
     public void orderProduct( Orderable product )
     {
-        //todo check availability
-
-        //todo decide payment method
-
-        //todo check if the payment was successfully completed
-
+        // todo store order
         //todo subtract from inventory
     }
+
+    /**
+     * Prints a product list of all products so the maintainer can choose what
+     * products he wants to refill.
+     */
+    public void selectInventoryToAddMode()
+    {
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
+
+        for ( Orderable product : this.inventory.getAll() )
+        {
+            menuBuilder.addAction( product.getName(), () -> this.fillInventory( product ) );
+        }
+        menuBuilder.setTitle( "==[ Resupply to inventory ]==" )
+                   .setDescription( "Select the product you want to resupply:" )
+                   .setCloseAutomaticallyOnAction( true )
+                   .addAction( "Go back to the previous menu", this::maintainersMode )
+                   .build()
+                   .showDialog( this.textGUI );
+    }
+
+    public void fillInventory(Orderable item)
+    {
+    }
+    /**
+     * Enables the maintenance staff to add new products to the machines inventory.
+     */
+    public void addNewProduct()
+    {
+
+    }
+
+    /**
+     * Enables the user to select the payment method he or se prefers for
+     * completing his order.
+     */
+    public void paymentSelectionMode()
+    {
+
+    }
+
+    /**
+     * Enables the user to complete him or his order by starting a transaction
+     * between the payment method and vending machine.
+     */
+    public void completeOrderMode(PaymentMethod method)
+    {
+        // Todo switch between cash and networked payments.
+
+        //todo implement a cash payment menu? that counts down and lets the user
+        //      select what coin to use.
+
+        // Todo implement a networked payment menu.
+
+        // Todo Call check availability to check if the payment API is available.
+        //  - print error dialog
+        //  - Do payment and notify the user about the success.
+    }
+
+    /**
+     * Notifies a user about a event.
+     * @param message Info, debug, warnings that are not errors.
+     */
+    public void notifyMessage( String message )
+    {
+        new MessageDialogBuilder()
+                .setTitle("==[ Notice ]==")
+                .setText(message)
+                .addButton( MessageDialogButton.OK )
+                .build()
+                .showDialog(textGUI);
+    }
+
+    /**
+     * Notifies a user about a error occurrence.
+     * @param message Warnings, errors and if unlucky fatal's.
+     */
+    public void errorMessage( String message )
+    {
+        new MessageDialogBuilder()
+                .setTitle("==[ An error occurred ]==")
+                .setText(message)
+                .addButton(MessageDialogButton.Retry)
+                .addButton(MessageDialogButton.Continue)
+                .addButton(MessageDialogButton.Abort )
+                .build()
+                .showDialog(textGUI);
+    }
+
+
 
     public void addInventory( Orderable product, Integer amount )
     {
