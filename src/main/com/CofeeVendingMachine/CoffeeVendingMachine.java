@@ -3,7 +3,9 @@ package com.CofeeVendingMachine;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
@@ -16,6 +18,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.net.SocketException;
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static java.lang.System.*;
 
@@ -34,10 +37,14 @@ public class CoffeeVendingMachine
     final static private String MENU_FOOT_FORMAT = "---------------------------------------------";
 
     private Terminal terminal;
+
     public Screen screen;
+
     private TextGraphics textGraphics;
 
     private WindowBasedTextGUI textGUI;
+
+    private BasicWindow window;
 
     /**
      * The buffer for reading users input.
@@ -179,6 +186,12 @@ public class CoffeeVendingMachine
         // Create a terminal for user IO.
         this.terminal = new DefaultTerminalFactory().createTerminal();
 
+        // Set virtual effects of the terminal
+        terminal.setForegroundColor( TextColor.ANSI.GREEN );
+        terminal.setBackgroundColor(TextColor.ANSI.BLACK);
+
+        terminal.enterPrivateMode();
+
         // Create a appropriate screen (UnixTerminal, SwingTerminal or even
         // Telnet terminal) for displaying output to user.
         this.screen = new TerminalScreen( terminal );
@@ -191,6 +204,9 @@ public class CoffeeVendingMachine
 
         // Add a gui that supports multiple windows to the screen.
         this.textGUI = new MultiWindowTextGUI( screen );
+
+        // Create window to hold the panel
+        this.window = new BasicWindow();
     }
 
     /**
@@ -201,6 +217,7 @@ public class CoffeeVendingMachine
     {
         try
         {
+            this.terminal.exitPrivateMode();
             screen.stopScreen();
             this.inventory = new Inventory( getInitialInventory() );
             this.orderedProducts = new HashSet<>();
@@ -241,10 +258,14 @@ public class CoffeeVendingMachine
      * Runs the main program loop of the coffee vending machine. After the
      * system is initiated by boot
      */
-    public void run()
+    public void run() throws IOException
     {
-        textGraphics.fillRectangle( new TerminalPosition( 1, 1 ), new TerminalSize( 80, 40 ), '#' );
-        textGraphics.putString( new TerminalPosition( 30, 10 ), "Welcome to our coffee vending machine" );
+        this.textGraphics.fillRectangle( new TerminalPosition( 1, 1 ), new TerminalSize( 80, 40 ), '#' );
+        this.textGraphics.putString( new TerminalPosition( 30, 10 ), "Welcome to our coffee vending machine" );
+        this.terminal.flush();
+        this.screen.refresh();
+
+        this.textGUI.waitForWindowToClose( this.window );
         // Print the main menu
         this.initialStartupMode();
     }
@@ -257,12 +278,13 @@ public class CoffeeVendingMachine
                 .addAction( "Order a beverage.", this::orderBeverageMode )
                 .addAction( "Maintainers mode.", this::maintainersMode )
                 .addAction( "Reboot (Data will be wiped)", this::reboot )
-                .addAction( "Shutdown (exit the simulator)", this::shutdown );/*
-        // Print the header of the main menu
-        out.format( MENU_HEAD_FORMAT, "Coffee Vending Menu" );
+                .addAction( "Shutdown (exit the simulator)", this::shutdown )
+                .build()
+                .showDialog( this.textGUI );
+        /*
 
         // Look in the inventory for available beverages and print a menu for the user.
-        List<Beverage> beverges = this.inventory.getBeverges();
+        List<Beverage> beverges = this.inventory.getBeverage();
         for ( int i = 0, beverageSize = beverges.size(); i < beverageSize; i++ )
         {
             out.format( MENU_OPT_FORMAT, i, beverges.get( i ).getName() );
@@ -305,7 +327,24 @@ public class CoffeeVendingMachine
 
     public void orderBeverageMode()
     {
+        new ActionListDialogBuilder()
+                .setTitle( "==[ Order A Beverage ]==" )
+                .setDescription( "Please choose one of the following actions:" )
+                .addAction( "Order a beverage.", this::orderBeverageMode )
+                .addAction( "Maintainers mode.", this::maintainersMode )
+                .addAction( "Reboot (Data will be wiped)", this::reboot )
+                .addAction( "Shutdown (exit the simulator)", this::shutdown )
+                .build()
+                .showDialog( this.textGUI );
 
+        this.inventory.getBeverages().stream()
+                .forEach( beverage ->  );
+
+        IntStream.range( 0, this.inventory.getBeverages().size() )
+                 .map(  )
+                 .forEachOrdered( (k,v) -> {
+
+                 } );
     }
 
     public void selectAdditionsMode()

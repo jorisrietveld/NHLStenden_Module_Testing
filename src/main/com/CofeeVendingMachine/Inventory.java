@@ -4,12 +4,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Inventory
 {
 
     private Map<Orderable, Integer> currentInventory;
+
+    private Predicate<Map.Entry<Orderable, Integer>> inventoryNotEmpty = entry -> entry.getValue() > 0;
 
     /**
      * Initiate a empty inventory.
@@ -50,6 +55,7 @@ public class Inventory
         return currentInventory.getOrDefault( product, 0 );
     }
 
+
     /**
      * Checks if a product exists in this inventory.
      *
@@ -62,19 +68,21 @@ public class Inventory
         return currentInventory.containsKey( product );
     }
 
-    public List<Beverage> getBeverges()
+    public List<Beverage> getBeverages()
     {
-        return this.currentInventory.keySet().stream()
-                                    .filter( p -> p instanceof Beverage )
-                                    .map( p -> (Beverage) p )
+        return this.currentInventory.entrySet().stream()
+                                    .filter( inventoryNotEmpty )
+                                    .filter( e -> e.getKey() instanceof Beverage )
+                                    .map( e -> (Beverage)e )
                                     .collect( Collectors.toList() );
     }
 
     public List<Addition> getAdditions()
     {
-        return this.currentInventory.keySet().stream()
-                                    .filter( p -> p instanceof Addition )
-                                    .map( p -> (Addition) p )
+        return this.currentInventory.entrySet().stream()
+                                    .filter( inventoryNotEmpty )
+                                    .filter( e -> e.getKey() instanceof Addition )
+                                    .map( e -> (Addition)e )
                                     .collect( Collectors.toList() );
     }
 }
