@@ -2,7 +2,8 @@ package com.CofeeVendingMachine;
 
 import java.math.BigDecimal;
 
-public class CashPayment implements PaymentMethod {
+public class CashPayment implements Payable
+{
 
 	public CashPayment()
     {
@@ -12,7 +13,7 @@ public class CashPayment implements PaymentMethod {
 
 
 	/**
-	 * @see PaymentMethod#pay(BigDecimal)
+	 * @see Payable#pay(BigDecimal)
 	 * 
 	 *  
 	 */
@@ -23,7 +24,7 @@ public class CashPayment implements PaymentMethod {
 
 
 	/**
-	 * @see PaymentMethod#isAvailable()
+	 * @see Payable#isAvailable()
 	 */
 	public boolean isAvailable() {
 		return true;

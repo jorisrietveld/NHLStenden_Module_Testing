@@ -2,7 +2,7 @@ package com.CofeeVendingMachine;
 
 import java.math.BigDecimal;
 
-public interface PaymentMethod
+public interface Payable
 {
     /**
      * Complete a order in the coffee vending machine by transacting owed money

@@ -11,7 +11,7 @@ import java.util.Map;
  * This class abstracts all payment methods that require network access to
  * complete the transaction.
  */
-public abstract class NetworkPayment implements PaymentMethod
+public abstract class NetworkPayment implements Payable
 {
     private URL paymentAPI;
     private HttpURLConnection urlConnection;

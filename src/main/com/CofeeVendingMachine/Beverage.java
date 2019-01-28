@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a beverage that can be ordered in the coffee vending
@@ -109,7 +110,12 @@ public class Beverage extends Product implements Orderable
     @Override
     public String getName()
     {
-        return this.name;
+        String fullName = this.name;
+
+        return this.name + " " + this.getAdditions().stream()
+                                     .map( Product::getName )
+                                     .distinct()
+                                     .collect( Collectors.joining() );
     }
 
     @Override

@@ -1,15 +1,12 @@
 package com.CofeeVendingMachine;
 
 
-import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
-import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
@@ -17,14 +14,11 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.sun.org.apache.xpath.internal.operations.Or;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.SocketException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static java.lang.System.*;
 
@@ -54,7 +48,7 @@ public class CoffeeVendingMachine
     /**
      *
      */
-    private List<PaymentMethod> availablePaymentMethods;
+    private List<Payable> availablePaymentMethods;
 
     /**
      * If set false it will initiate a shutdown.
@@ -380,7 +374,7 @@ public class CoffeeVendingMachine
         beverageBuilder.buildFrom( beverage );
 
         this.inventory.getAdditions( beverage )
-                      .forEach( a -> beverageBuilder.addAddition( a ));
+                      .forEach( a -> beverageBuilder.addAddition( a ) );
 
         for ( Addition addition : this.inventory.getAdditions( beverage ) )
         {
@@ -447,7 +441,7 @@ public class CoffeeVendingMachine
         this.inventory.fillProduct( product );
         int newInventory = this.inventory.getStockOfProduct( product );
 
-        this.notifyMessage( String.format( "The the product is refilled from: %d to: %d", oldInventory, newInventory) );
+        this.notifyMessage( String.format( "The the product is refilled from: %d to: %d", oldInventory, newInventory ) );
         this.selectInventoryToAddMode();
     }
 
@@ -457,10 +451,10 @@ public class CoffeeVendingMachine
      */
     public void paymentSelectionMode( Beverage beverage )
     {
-        notifyMessage( "Please select a method to pay "+beverage.getPrice()+" euro." );
+        notifyMessage( "Please select a method to pay " + beverage.getPrice() + " euro." );
         ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
 
-        for ( PaymentMethod method : this.availablePaymentMethods )
+        for ( Payable method : this.availablePaymentMethods )
         {
             menuBuilder.addAction(
                     "Pay with: " + method.toString(),
@@ -478,11 +472,15 @@ public class CoffeeVendingMachine
      * Enables the user to complete him or his order by starting a transaction
      * between the payment method and vending machine.
      */
-    public void completeOrderMode( PaymentMethod method, Beverage beverage )
+    public void completeOrderMode( Payable method, Beverage beverage )
     {
-        if( method.isAvailable() )
+        if ( method.isAvailable() )
         {
-            this.notifyMessage( "Done your: " + beverage.getName() + " will be served shortly." );
+            this.notifyMessage( String.format(
+                    "Done your: %s will be ready shortly %n You payed: %d euro using %s.",
+                    beverage.getName(),
+                    beverage.getPrice().intValue(),
+                    method.toString() ) );
         }
         else
         {
