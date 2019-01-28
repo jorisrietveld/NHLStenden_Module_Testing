@@ -1,5 +1,7 @@
 package com.CofeeVendingMachine;
 
+import com.sun.org.apache.xpath.internal.operations.Or;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,7 +14,6 @@ import java.util.stream.Stream;
 
 public class Inventory
 {
-
     private Map<Orderable, Integer> currentInventory;
 
     private Predicate<Map.Entry<Orderable, Integer>> inventoryNotEmpty = entry -> entry.getValue() > 0;
@@ -69,6 +70,11 @@ public class Inventory
         return currentInventory.containsKey( product );
     }
 
+    public void fillProduct( Orderable product)
+    {
+ /*       this.currentInventory.keySet().stream()
+                .anyMatch( k -> k.equals( product ) ).*/
+    }
     /**
      * Gets a list of all beverages that are available for purchase so we can
      * show them to the user.

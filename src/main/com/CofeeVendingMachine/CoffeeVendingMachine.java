@@ -369,7 +369,7 @@ public class CoffeeVendingMachine
 
         for ( Orderable product : this.inventory.getAll() )
         {
-            menuBuilder.addAction( product.getName(), () -> this.addInventoryMode( product ) );
+            menuBuilder.addAction( product.getName(), () -> this.fillInventory( product ) );
         }
         menuBuilder.setTitle( "==[ Resupply to inventory ]==" )
                    .setDescription( "Select the product you want to resupply:" )
@@ -379,15 +379,9 @@ public class CoffeeVendingMachine
                    .showDialog( this.textGUI );
     }
 
-    /**
-     * Enables the maintenance staff to resupply "Units" of a product to the
-     * inventory. It creates number-input dialog asking for the amount.
-     */
-    public void addInventoryMode(Orderable product)
+    public void fillInventory(Orderable item)
     {
-
     }
-
     /**
      * Enables the maintenance staff to add new products to the machines inventory.
      */
