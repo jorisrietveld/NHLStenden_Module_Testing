@@ -300,7 +300,7 @@ public class CoffeeVendingMachine
         new ActionListDialogBuilder().setTitle( "==[ Maintainers Mode ]==" )
                                      .setDescription( "Please choose one of the following actions:" )
                                      .setCloseAutomaticallyOnAction( true )
-                                     .addAction( "Add new inventory.", this::addInventory )
+                                     .addAction( "Add new inventory.", this::selectInventoryToAddMode )
                                      .addAction( "Resupply new inventory.", this::maintainersMode )
                                      .addAction( "Reboot", this::reboot )
                                      .addAction( "Shutdown (exit the simulator)", this::shutdown )
@@ -317,7 +317,7 @@ public class CoffeeVendingMachine
 
         for ( Beverage beverage : this.inventory.getBeverages() )
         {
-            menuBuilder.addAction( beverage.getName(), () -> this.orderProduct( beverage ) );
+            menuBuilder.addAction( beverage.getName(), () -> this.beverageAdditionsMode( beverage ) );
         }
         menuBuilder.setTitle( "==[ Order A Beverage ]==" )
                    .setDescription( "Please select the beverage you want to order:" )
@@ -342,9 +342,28 @@ public class CoffeeVendingMachine
         }
         menuBuilder.setTitle( "==[ Beverage Customization ]==" )
                    .setDescription( "Add to your beverage:" )
+                   .setCloseAutomaticallyOnAction( true )
                    .addAction( "Go back to the previous menu", this::initialStartupMode )
                    .build()
                    .showDialog( this.textGUI );
+    }
+
+    public Product addAdditionToProduct(Addition addition, Beverage product )
+    {
+        return product.addAddition(addition);
+
+    /**
+     * @param product
+     */
+    public void orderProduct( Orderable product )
+    {
+        //todo check availability
+
+        //todo decide payment method
+
+        //todo check if the payment was successfully completed
+
+        //todo subtract from inventory
     }
 
     /**
@@ -430,22 +449,6 @@ public class CoffeeVendingMachine
                 .showDialog(textGUI);
     }
 
-
-
-
-    /**
-     * @param product
-     */
-    public void orderProduct( Orderable product )
-    {
-        //todo check availability
-
-        //todo decide payment method
-
-        //todo check if the payment was successfully completed
-
-        //todo subtract from inventory
-    }
 
 
     public void addInventory( Orderable product, Integer amount )

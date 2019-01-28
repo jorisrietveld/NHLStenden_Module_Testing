@@ -1,5 +1,6 @@
 package com.CofeeVendingMachine;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +26,11 @@ public class Beverage implements Orderable
      * A registry that keeps track of compatible additions to a beverage.
      */
     private List<Addition> availableAdditions = new ArrayList<>();
+
+    /**
+     * A list of added ingredients to an beverage.
+     */
+    private List<Addition> additions = new ArrayList<>();
 
     /**
      * Create a free beverage.
@@ -61,6 +67,23 @@ public class Beverage implements Orderable
         this.availableAdditions.addAll( Arrays.asList( additions ) );
     }
 
+    /**
+     *
+     * @return
+     */
+    public List<Addition> getAdditions()
+    {
+        return this.additions;
+    }
+
+    /**
+     *
+     * @param addition
+     */
+    public void addAddition(Addition addition)
+    {
+        this.additions.add( addition );
+    }
 
     /**
      * Sets the products price.
