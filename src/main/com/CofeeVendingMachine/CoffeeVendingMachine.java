@@ -70,11 +70,20 @@ public class CoffeeVendingMachine
     /**
      * If set false it will initiate a shutdown.
      */
-    private boolean exitSignal = false;
     private boolean powerOffSignal = false;
 
+    /**
+     * This will be the return signal when exiting the simulator.
+     */
     private static int simulatorExitSignal = 0;
+
+    /**
+     * When a fatal exception occurs it will be stored here for debugging.
+     */
     private static Exception fatalSimulatorStateException;
+
+    public static BeverageBuilder beverageBuilder = new BeverageBuilder();
+    public static AddtionBuilder addtionBuilder = new AddtionBuilder();
 
     /**
      * An initiation method that configures the coffee vending with the default
@@ -84,20 +93,49 @@ public class CoffeeVendingMachine
      */
     private static Map<Orderable, Integer> getInitialInventory()
     {
-        Map<Orderable, Integer> initialInventory = new LinkedHashMap<>();
-        initialInventory.put( new Beverage( "Coffee", BigDecimal.ZERO ), 100 );
-        initialInventory.put( new Beverage( "Espresso", new BigDecimal( "0.05" ) ), 100 );
-        initialInventory.put( new Beverage( "Cappucino", new BigDecimal( "0.01" ) ), 100 );
-        initialInventory.put( new Beverage( "ChocolateMilk", BigDecimal.ONE ), 100 );
-        initialInventory.put( new Beverage( "HotWater", new BigDecimal( "5.99" ) ), 100 );
-        initialInventory.put( new Beverage( "IrishCoffee", BigDecimal.ZERO ), 100 );
-        initialInventory.put( new Beverage( "LatteMachiatto", new BigDecimal( "1.77" ) ), 100 );
-        initialInventory.put( new Beverage( "ColdWater", new BigDecimal( "12.95" ) ), 100 );
+        Map<Orderable, Integer> inv = new LinkedHashMap<>();
 
-        initialInventory.put( new Addition("Milk", BigDecimal.ZERO), 100);
-        initialInventory.put( new Addition("Sugar", BigDecimal.ZERO), 100);
+        Addition milk = addtionBuilder.setName( "Milk" ).build();
+        Addition sugar = addtionBuilder.setName( "Sugar" ).build();
 
-        return initialInventory;
+        inv.put( milk, Addition.MAX_QUANTITY );
+        inv.put( sugar, Addition.MAX_QUANTITY );
+
+        inv.put( beverageBuilder.setName( "Coffee" )
+                                .addAvailableAdditions( milk, sugar )
+                                .build(), Beverage.MAX_QUANTITY );
+
+        inv.put( beverageBuilder.setName( "Espresso" )
+                                .setPrice( "0.05" )
+                                .build(), Beverage.MAX_QUANTITY );
+
+        inv.put( beverageBuilder.setName( "Cappucino" )
+                                .setPrice( "0.01" )
+                                .addAvailableAddition( sugar )
+                                .build(), Beverage.MAX_QUANTITY );
+
+        inv.put( beverageBuilder.setName( "ChocolateMilk" )
+                                .setPrice( BigDecimal.ONE )
+                                .build(), Beverage.MAX_QUANTITY );
+
+        inv.put( beverageBuilder.setName( "HotWater" )
+                                .setPrice( "5.99" )
+                                .build(), Beverage.MAX_QUANTITY );
+
+        inv.put( beverageBuilder.setName( "IrishCoffee" )
+                                .addAvailableAddition( sugar )
+                                .setPrice( BigDecimal.ZERO )
+                                .build(), Beverage.MAX_QUANTITY );
+
+        inv.put( beverageBuilder.setName( "LatteMachiatto" )
+                                .addAvailableAdditions( milk, sugar )
+                                .setPrice( "1.77" )
+                                .build(), Beverage.MAX_QUANTITY );
+
+        inv.put( beverageBuilder.setName( "ColdWater" )
+                                .setPrice( "12.95" )
+                                .build(), Beverage.MAX_QUANTITY );
+        return inv;
     }
 
     /**
@@ -221,7 +259,7 @@ public class CoffeeVendingMachine
         // Create window to hold the panel
         this.window = new BasicWindow();
 
-        this.window.setHints(Arrays.asList(Window.Hint.FULL_SCREEN));
+        this.window.setHints( Arrays.asList( Window.Hint.FULL_SCREEN ) );
     }
 
     /**
@@ -308,9 +346,9 @@ public class CoffeeVendingMachine
         new ActionListDialogBuilder().setTitle( "==[ Maintainers Mode ]==" )
                                      .setDescription( "Please choose one of the following actions:" )
                                      .setCloseAutomaticallyOnAction( true )
-                                  /*   .addAction( "Add new inventory.", this::selectInventoryToAddMode )*/
+                                     /*   .addAction( "Add new inventory.", this::selectInventoryToAddMode )*/
                                      .addAction( "Resupply the inventory.", this::maintainersMode )
-                             /*        .addAction( "Enable/Disable payment methods.", this::maintainersMode )*/
+                                     /*        .addAction( "Enable/Disable payment methods.", this::maintainersMode )*/
                                      .addAction( "Reboot", this::reboot )
                                      .addAction( "Shutdown (exit the simulator)", this::shutdown )
                                      .build()
@@ -347,10 +385,35 @@ public class CoffeeVendingMachine
 
         for ( Addition addition : this.inventory.getAdditions( forProduct ) )
         {
-            menuBuilder.addAction( addition.getName(), () -> this.orderProduct( addition ) );
+            menuBuilder.addAction( addition.getName(), () -> this.setAdditionStrength( forProduct, addition ) );
         }
         menuBuilder.setTitle( "==[ Beverage Customization ]==" )
                    .setDescription( "Add to your beverage:" )
+                   .setCloseAutomaticallyOnAction( true )
+                   .addAction( "Go back to the previous menu", this::initialStartupMode )
+                   .build()
+                   .showDialog( this.textGUI );
+    }
+
+
+    public void setAdditionStrength( Beverage beverage, Addition addition )
+    {
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
+
+        menuBuilder.addAction( "little amount",
+                () -> this.beverageAdditionsMode( beverageBuilder.updateAddition( beverage, Addition.updateQuantity( addition, 1 ) ).build() ) );
+
+        menuBuilder.addAction( "normal amount",
+                () -> this.beverageAdditionsMode( beverageBuilder.updateAddition( beverage, Addition.updateQuantity( addition, 2 ) ).build() ) );
+
+        menuBuilder.addAction( "Large amount",
+                () -> this.beverageAdditionsMode( beverageBuilder.updateAddition( beverage, Addition.updateQuantity( addition, 3 ) ).build() ) );
+
+        menuBuilder.addAction( "Extra Large amount",
+                () -> this.beverageAdditionsMode( beverageBuilder.updateAddition( beverage, Addition.updateQuantity( addition, 4 ) ).build() ) );
+
+        menuBuilder.setTitle( "==[ " + beverage.getName() + " Customization ]==" )
+                   .setDescription( "Add " + addition.getName() + " to your beverage:" )
                    .setCloseAutomaticallyOnAction( true )
                    .addAction( "Go back to the previous menu", this::initialStartupMode )
                    .build()
@@ -386,9 +449,10 @@ public class CoffeeVendingMachine
                    .showDialog( this.textGUI );
     }
 
-    public void fillInventory(Orderable item)
+    public void fillInventory( Orderable item )
     {
     }
+
     /**
      * Enables the maintenance staff to add new products to the machines inventory.
      */
@@ -410,7 +474,7 @@ public class CoffeeVendingMachine
      * Enables the user to complete him or his order by starting a transaction
      * between the payment method and vending machine.
      */
-    public void completeOrderMode(PaymentMethod method)
+    public void completeOrderMode( PaymentMethod method )
     {
         // Todo switch between cash and networked payments.
 
@@ -426,34 +490,35 @@ public class CoffeeVendingMachine
 
     /**
      * Notifies a user about a event.
+     *
      * @param message Info, debug, warnings that are not errors.
      */
     public void notifyMessage( String message )
     {
         new MessageDialogBuilder()
-                .setTitle("==[ Notice ]==")
-                .setText(message)
+                .setTitle( "==[ Notice ]==" )
+                .setText( message )
                 .addButton( MessageDialogButton.OK )
                 .build()
-                .showDialog(textGUI);
+                .showDialog( textGUI );
     }
 
     /**
      * Notifies a user about a error occurrence.
+     *
      * @param message Warnings, errors and if unlucky fatal's.
      */
     public void errorMessage( String message )
     {
         new MessageDialogBuilder()
-                .setTitle("==[ An error occurred ]==")
-                .setText(message)
-                .addButton(MessageDialogButton.Retry)
-                .addButton(MessageDialogButton.Continue)
-                .addButton(MessageDialogButton.Abort )
+                .setTitle( "==[ An error occurred ]==" )
+                .setText( message )
+                .addButton( MessageDialogButton.Retry )
+                .addButton( MessageDialogButton.Continue )
+                .addButton( MessageDialogButton.Abort )
                 .build()
-                .showDialog(textGUI);
+                .showDialog( textGUI );
     }
-
 
 
     public void addInventory( Orderable product, Integer amount )

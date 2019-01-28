@@ -31,17 +31,17 @@ abstract class Product
     /**
      * A list of additions to this product.
      */
-    private List<Addition> additions;
+    protected List<Addition> additions = new ArrayList<>();
 
     /**
      * The price of this single product.
      */
-    private BigDecimal price;
+    protected BigDecimal price;
 
     /**
      * The name of this single product or addition.
      */
-    private String name;
+    protected String name;
 
     /**
      * Create a free addition of a beverage.
@@ -117,5 +117,4 @@ abstract class Product
         // Return the products name and append it with its additions using csv.
         return this.name + " With: " + this.additions.stream().collect( this.productNameCollector );
     }
-
 }

@@ -10,17 +10,11 @@ import java.util.List;
  * This class represents a beverage that can be ordered in the coffee vending
  * machine.
  */
-public class Beverage implements Orderable
+public class Beverage extends Product implements Orderable
 {
-    /**
-     * The base price of the beverage.
-     */
-    private BigDecimal price;
-
-    /**
-     * The base name of the beverage.
-     */
-    private String name;
+    public static final int MIN_QUANTITY = 0;
+    public static final int MAX_QUANTITY = 100;
+    public static final int LOW_QUANTITY = 20;
 
     /**
      * A registry that keeps track of compatible additions to a beverage.
@@ -48,9 +42,7 @@ public class Beverage implements Orderable
      */
     public Beverage( String name, BigDecimal price )
     {
-        this.name = name;
-        this.price = price;
-
+       super(name, price);
     }
 
     /**
@@ -58,13 +50,26 @@ public class Beverage implements Orderable
      *
      * @param name  The name of the beverage.
      * @param price The price of the beverage.
-     * @param additions Possible additions to this beverage.
+     * @param availableAdditions Possible additions to this beverage.
      */
-    public Beverage( String name, BigDecimal price, Addition... additions )
+    public Beverage( String name, BigDecimal price, List<Addition> availableAdditions )
     {
-        this.name = name;
-        this.price = price;
-        this.availableAdditions.addAll( Arrays.asList( additions ) );
+        super(name, price);
+        this.availableAdditions.addAll( availableAdditions );
+    }
+
+    /**
+     * Create a beverage that the customer has to pay for.
+     *
+     * @param name  The name of the beverage.
+     * @param price The price of the beverage.
+     * @param availableAdditions Possible additions to this beverage.
+     */
+    public Beverage( String name, BigDecimal price, List<Addition> availableAdditions, List<Addition> additions )
+    {
+        super(name, price);
+        this.availableAdditions.addAll( availableAdditions );
+        this.additions.addAll( additions );
     }
 
     /**
@@ -153,10 +158,10 @@ public class Beverage implements Orderable
 
         Beverage beverage = (Beverage) o;
 
-        if ( !this.getPrice().equals( ((Beverage) o).getPrice() ) )
+       /* if ( !this.getPrice().equals( ((Beverage) o).getPrice() ) )
         {
             return false;
-        }
+        }*/
 
         if ( this.getName().equals( beverage.getName() ) )
         {

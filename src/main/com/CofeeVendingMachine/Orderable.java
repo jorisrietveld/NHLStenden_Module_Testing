@@ -22,5 +22,9 @@ public interface Orderable
      */
      String getName();
 
+    /**
+     *
+     * @return
+     */
     public List<Addition> getAvailableAdditions();
 }
