@@ -18,6 +18,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.net.SocketException;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.lang.System.*;
@@ -327,24 +328,42 @@ public class CoffeeVendingMachine
 
     public void orderBeverageMode()
     {
-        new ActionListDialogBuilder()
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder()
                 .setTitle( "==[ Order A Beverage ]==" )
-                .setDescription( "Please choose one of the following actions:" )
-                .addAction( "Order a beverage.", this::orderBeverageMode )
-                .addAction( "Maintainers mode.", this::maintainersMode )
-                .addAction( "Reboot (Data will be wiped)", this::reboot )
-                .addAction( "Shutdown (exit the simulator)", this::shutdown )
-                .build()
-                .showDialog( this.textGUI );
+                .setDescription( "Please select the beverage you want to order:");
 
-        this.inventory.getBeverages().stream()
-                .forEach( beverage ->  );
+        this.inventory.getBeverages().forEach( beverage ->
+                                             );
+        List<Runnable> orders = this.inventory.getBeverages().stream()
+                                                     .map( beverage -> new Runnable(){
+                                                             String string(){
+                                                                 return beverage.getName();
+                                                             }
 
-        IntStream.range( 0, this.inventory.getBeverages().size() )
-                 .map(  )
-                 .forEachOrdered( (k,v) -> {
+                                                             @Override
+                                                             public void run()
+                                                             {
+                                                                 orderProduct( beverage );
+                                                             }
+                                                         }
+                                                     });
 
-                 } );
+                .collect( Collectors.toMap( beverage -> () -> orderProduct( beverage), Beverage::getName  )
+
+
+                .<Runnable> map( beverage -> () -> orderProduct( beverage ) )
+                        this.inventory.getBeverages().stream()
+
+                                .<Runnable> map( beverage -> () -> orderProduct( beverage ) )
+                                      .toArray(  )
+                           );
+
+                this.inventory.getBeverages().stream()
+                        .forEach( b -> b.getName() ); )
+        Runnable[] orderBeverages = this.inventory.getBeverages().stream()
+                .<Runnable> map( beverage -> () -> orderProduct( beverage ) )
+                .collect( Collectors.toCollection() )
+
     }
 
     public void selectAdditionsMode()
@@ -355,7 +374,7 @@ public class CoffeeVendingMachine
     /**
      * @param product
      */
-    public void orderProduct( Orderable product )
+    public static void orderProduct( Orderable product )
     {
         //todo check availability
 
