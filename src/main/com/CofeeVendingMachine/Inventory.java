@@ -68,21 +68,34 @@ public class Inventory
         return currentInventory.containsKey( product );
     }
 
+    /**
+     * Gets a list of all beverages that are available for purchase so we can
+     * show them to the user.
+     *
+     * @return Currently available beverages.
+     */
     public List<Beverage> getBeverages()
     {
         return this.currentInventory.entrySet().stream()
                                     .filter( inventoryNotEmpty )
                                     .filter( e -> e.getKey() instanceof Beverage )
-                                    .map( e -> (Beverage)e )
+                                    .map( e -> (Beverage)e.getKey() )
                                     .collect( Collectors.toList() );
     }
 
-    public List<Addition> getAdditions()
+    /**
+     * Gets a list of all beverages that are available for purchase so we can
+     * show them to the user.
+     *
+     * @return Currently available beverages.
+     */
+    public List<Addition> getAdditions(Beverage toBeverage )
     {
         return this.currentInventory.entrySet().stream()
                                     .filter( inventoryNotEmpty )
                                     .filter( e -> e.getKey() instanceof Addition )
-                                    .map( e -> (Addition)e )
+                                    .map( e -> (Addition)e.getKey() )
+                                    .filter( toBeverage::isCompatible )
                                     .collect( Collectors.toList() );
     }
 }

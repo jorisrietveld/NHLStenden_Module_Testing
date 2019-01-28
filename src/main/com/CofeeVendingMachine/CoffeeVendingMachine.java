@@ -8,6 +8,7 @@ import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
@@ -281,7 +282,7 @@ public class CoffeeVendingMachine
                 .addAction( "Reboot (Data will be wiped)", this::reboot )
                 .addAction( "Shutdown (exit the simulator)", this::shutdown )
                 .build()
-                .showDialog( this.textGUI );
+            .showDialog( this.textGUI );
         /*
 
         // Look in the inventory for available beverages and print a menu for the user.
@@ -332,37 +333,25 @@ public class CoffeeVendingMachine
                 .setTitle( "==[ Order A Beverage ]==" )
                 .setDescription( "Please select the beverage you want to order:" );
 
-        for( Beverage beverage: this.inventory.getBeverages())
+        for ( Beverage beverage : this.inventory.getBeverages() )
         {
             menuBuilder.addAction( beverage.getName(), () -> this.orderProduct( beverage ) );
         }
-                beverage -> { menuBuilder.addAction(
-                        beverage.getName(),
-                        () -> this.orderProduct( beverage ) )
-                });
-
-
-                .collect( Collectors.toMap( beverage -> () -> orderProduct( beverage ), Beverage::getName )
-
-
-            .<Runnable>map( beverage -> () -> orderProduct( beverage ) )
-        this.inventory.getBeverages().stream()
-
-                .<Runnable>map( beverage -> () -> orderProduct( beverage ) )
-                .toArray()
-                           );
-
-        this.inventory.getBeverages().stream()
-                      .forEach( b -> b.getName() ); )
-        Runnable[] orderBeverages = this.inventory.getBeverages().stream()
-                .<Runnable>map( beverage -> () -> orderProduct( beverage ) )
-                .collect( Collectors.toCollection() )
-
+        menuBuilder.build().showDialog( this.textGUI );
     }
 
-    public void selectAdditionsMode()
+    public void beverageAdditionsMode( Product ofProduct )
     {
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder()
+                .setTitle( "==[ Beverage Customization ]==" )
+                .setDescription( "Add to your beverage:" );
 
+        for ( Addition addition : this.inventory.getAdditions() )
+        {
+            menuBuilder.addAction( addition.getName(), () -> this.orderProduct( addition ) );
+        }
+
+        menuBuilder.build().showDialog( this.textGUI );
     }
 
     /**
@@ -378,6 +367,8 @@ public class CoffeeVendingMachine
 
         //todo subtract from inventory
     }
+
+
 
     public void addInventory( Orderable product, Integer amount )
     {
