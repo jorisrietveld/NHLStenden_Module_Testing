@@ -17,6 +17,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.sun.org.apache.xpath.internal.operations.Or;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -300,8 +301,9 @@ public class CoffeeVendingMachine
         new ActionListDialogBuilder().setTitle( "==[ Maintainers Mode ]==" )
                                      .setDescription( "Please choose one of the following actions:" )
                                      .setCloseAutomaticallyOnAction( true )
-                                     .addAction( "Add new inventory.", this::selectInventoryToAddMode )
-                                     .addAction( "Resupply new inventory.", this::maintainersMode )
+                                  /*   .addAction( "Add new inventory.", this::selectInventoryToAddMode )*/
+                                     .addAction( "Resupply the inventory.", this::maintainersMode )
+                             /*        .addAction( "Enable/Disable payment methods.", this::maintainersMode )*/
                                      .addAction( "Reboot", this::reboot )
                                      .addAction( "Shutdown (exit the simulator)", this::shutdown )
                                      .build()
@@ -348,21 +350,12 @@ public class CoffeeVendingMachine
                    .showDialog( this.textGUI );
     }
 
-    public Product addAdditionToProduct(Addition addition, Beverage product )
-    {
-        return product.addAddition(addition);
-
     /**
      * @param product
      */
     public void orderProduct( Orderable product )
     {
-        //todo check availability
-
-        //todo decide payment method
-
-        //todo check if the payment was successfully completed
-
+        // todo store order
         //todo subtract from inventory
     }
 
@@ -372,14 +365,25 @@ public class CoffeeVendingMachine
      */
     public void selectInventoryToAddMode()
     {
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
 
+        for ( Orderable product : this.inventory.getAll() )
+        {
+            menuBuilder.addAction( product.getName(), () -> this.addInventoryMode( product ) );
+        }
+        menuBuilder.setTitle( "==[ Resupply to inventory ]==" )
+                   .setDescription( "Select the product you want to resupply:" )
+                   .setCloseAutomaticallyOnAction( true )
+                   .addAction( "Go back to the previous menu", this::maintainersMode )
+                   .build()
+                   .showDialog( this.textGUI );
     }
 
     /**
      * Enables the maintenance staff to resupply "Units" of a product to the
      * inventory. It creates number-input dialog asking for the amount.
      */
-    public void addInventoryMode(Product product)
+    public void addInventoryMode(Orderable product)
     {
 
     }
