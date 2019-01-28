@@ -8,9 +8,11 @@ import java.net.URL;
 public class PinPayment extends NetworkPayment
 {
 
-    public PinPayment() throws Exception
+    public PinPayment()
     {
+        /*
         super( new URL( "https://rabobank.com" ) );
+        */
     }
 
 
@@ -42,5 +44,11 @@ public class PinPayment extends NetworkPayment
             // Todo check if this behaviour is correct.
             return false;
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Pin";
     }
 }

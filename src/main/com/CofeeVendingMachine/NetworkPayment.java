@@ -23,13 +23,17 @@ public abstract class NetworkPayment implements PaymentMethod
         this.paymentAPI = paymentAPI;
     }
 
-    private void openConnection() throws Exception
+    public NetworkPayment()
+    {
+    }
+
+    private void openConnection() throws IOException
     {
         if ( this.urlConnection == null )
         {
             this.urlConnection = (HttpURLConnection) paymentAPI.openConnection();
         }
-        this.urlConnection.setDoInput(true); // true indicates the server returns response
+        this.urlConnection.setDoInput(true); // true indicates the server returns response*/
     }
 
     private byte[] preparePostData()

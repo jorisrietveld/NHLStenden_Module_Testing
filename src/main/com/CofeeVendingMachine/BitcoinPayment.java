@@ -1,13 +1,16 @@
 package com.CofeeVendingMachine;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 
 public class BitcoinPayment extends NetworkPayment
 {
-    public BitcoinPayment() throws Exception
+    public BitcoinPayment()
     {
+        /*
         super( new URL( "https://bitcoin.com" ) );
+         */
     }
 
     /**
@@ -30,6 +33,19 @@ public class BitcoinPayment extends NetworkPayment
     @Override
     public boolean isAvailable()
     {
-        return false;
+        try{
+            return this.checkNetworkAvailability();
+        }
+        catch ( IOException networkError )
+        {
+            // Todo check if this behaviour is correct.
+            return false;
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Bitcoin";
     }
 }

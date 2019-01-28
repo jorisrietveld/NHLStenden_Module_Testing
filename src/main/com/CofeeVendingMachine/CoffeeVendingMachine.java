@@ -35,27 +35,11 @@ import static java.lang.System.*;
  */
 public class CoffeeVendingMachine
 {
-    /**
-     * Constants that define the terminal output formats.
-     */
-    final static private String MENU_HEAD_FORMAT = "-----------[%1$22s]----------";
-    final static private String MENU_OPT_FORMAT = "[%d] - %s";
-    final static private String MENU_FOOT_FORMAT = "---------------------------------------------";
-
     private Terminal terminal;
-
     public Screen screen;
-
     private TextGraphics textGraphics;
-
     private WindowBasedTextGUI textGUI;
-
     private BasicWindow window;
-
-    /**
-     * The buffer for reading users input.
-     */
-    private BufferedReader bufferedReader = new BufferedReader( new InputStreamReader( in ) );
 
     /**
      * All products that are ordered by customers.
@@ -66,6 +50,11 @@ public class CoffeeVendingMachine
      * The inventory that keeps track of the stock of all ingredients present.
      */
     private Inventory inventory;
+
+    /**
+     *
+     */
+    private List<PaymentMethod> availablePaymentMethods;
 
     /**
      * If set false it will initiate a shutdown.
@@ -217,6 +206,11 @@ public class CoffeeVendingMachine
     {
         this.inventory = new Inventory( initialInventory );
         this.orderedProducts = new HashSet<>();
+
+        this.availablePaymentMethods = new ArrayList<>();
+        this.availablePaymentMethods.add( new PinPayment() );
+        this.availablePaymentMethods.add( new BitcoinPayment() );
+        this.availablePaymentMethods.add( new CashPayment() );
     }
 
     /**
@@ -396,6 +390,7 @@ public class CoffeeVendingMachine
         menuBuilder.setTitle( "==[ Beverage Customization ]==" )
                    .setDescription( "Add to your beverage:" )
                    .setCloseAutomaticallyOnAction( true )
+                   .addAction( "Done customizing, go to payment", () -> this.paymentSelectionMode( beverage ) )
                    .addAction( "Go back to the previous menu", this::initialStartupMode )
                    .build()
                    .showDialog( this.textGUI );
@@ -471,16 +466,29 @@ public class CoffeeVendingMachine
      * Enables the user to select the payment method he or se prefers for
      * completing his order.
      */
-    public void paymentSelectionMode()
+    public void paymentSelectionMode( Beverage beverage )
     {
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
 
+        for ( PaymentMethod method : this.availablePaymentMethods )
+        {
+            menuBuilder.addAction(
+                    "Pay with: " + method.toString(),
+                    () -> completeOrderMode( method, beverage ) );
+        }
+        menuBuilder.setTitle( "==[ Payment Selection ]==" )
+                   .setDescription( "Select the payment method:" )
+                   .setCloseAutomaticallyOnAction( true )
+                   .addAction( "Go back to the previous menu", this::maintainersMode )
+                   .build()
+                   .showDialog( this.textGUI );
     }
 
     /**
      * Enables the user to complete him or his order by starting a transaction
      * between the payment method and vending machine.
      */
-    public void completeOrderMode( PaymentMethod method )
+    public void completeOrderMode( PaymentMethod method, Beverage beverage )
     {
         // Todo switch between cash and networked payments.
 

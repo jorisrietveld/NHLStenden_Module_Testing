@@ -29,4 +29,10 @@ public class CashPayment implements PaymentMethod {
 		return true;
 	}
 
+    @Override
+    public String toString()
+    {
+        return "Cash";
+    }
+
 }
