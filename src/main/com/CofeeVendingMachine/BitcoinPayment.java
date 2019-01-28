@@ -6,6 +6,9 @@ import java.net.URL;
 
 public class BitcoinPayment extends NetworkPayment
 {
+    private static boolean disabled = false;
+
+
     public BitcoinPayment()
     {
         /*
@@ -33,6 +36,11 @@ public class BitcoinPayment extends NetworkPayment
     @Override
     public boolean isAvailable()
     {
+        if(this.disabled)
+        {
+            return false;
+        }
+
         try{
             return this.checkNetworkAvailability();
         }
@@ -41,6 +49,16 @@ public class BitcoinPayment extends NetworkPayment
             // Todo check if this behaviour is correct.
             return false;
         }
+    }
+
+    public void toggleMethod()
+    {
+        disabled = !disabled;
+    }
+
+    public boolean isDisabled()
+    {
+        return disabled;
     }
 
     @Override

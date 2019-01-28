@@ -489,6 +489,30 @@ public class CoffeeVendingMachine
         }
     }
 
+    public void paymentMethodList()
+    {
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
+
+        for ( Payable method : this.availablePaymentMethods )
+        {
+            menuBuilder.addAction(
+                    method.isDisabled() ? "Enable" : "Disable" + " payment method: " + method.toString(),
+                    () -> disablePaymentMethodMode(method));
+        }
+        menuBuilder.setTitle( "==[ Payment Selection ]==" )
+                   .setDescription( "Select the payment method:" )
+                   .setCloseAutomaticallyOnAction( true )
+                   .addAction( "Go back to the previous menu", this::maintainersMode )
+                   .build()
+                   .showDialog( this.textGUI );
+    }
+
+    public void disablePaymentMethodMode(Payable paymentMethod)
+    {
+        paymentMethod.toggleMethod();
+
+    }
+
     /**
      * Notifies a user about a event.
      *

@@ -7,6 +7,7 @@ import java.net.URL;
 
 public class PinPayment extends NetworkPayment
 {
+    private static boolean disabled = false;
 
     public PinPayment()
     {
@@ -36,6 +37,9 @@ public class PinPayment extends NetworkPayment
     @Override
     public boolean isAvailable()
     {
+        if(this.disabled){
+            return false;
+        }
         try{
             return this.checkNetworkAvailability();
         }
@@ -44,6 +48,15 @@ public class PinPayment extends NetworkPayment
             // Todo check if this behaviour is correct.
             return false;
         }
+    }
+    public void toggleMethod()
+    {
+        disabled = !disabled;
+    }
+
+    public boolean isDisabled()
+    {
+        return disabled;
     }
 
     @Override
