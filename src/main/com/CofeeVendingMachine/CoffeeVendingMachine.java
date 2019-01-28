@@ -7,6 +7,7 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
+import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
@@ -209,6 +210,8 @@ public class CoffeeVendingMachine
 
         // Create window to hold the panel
         this.window = new BasicWindow();
+
+        this.window.setHints(Arrays.asList(Window.Hint.FULL_SCREEN));
     }
 
     /**
@@ -262,96 +265,93 @@ public class CoffeeVendingMachine
      */
     public void run() throws IOException
     {
-        this.textGraphics.fillRectangle( new TerminalPosition( 1, 1 ), new TerminalSize( 80, 40 ), '#' );
-        this.textGraphics.putString( new TerminalPosition( 30, 10 ), "Welcome to our coffee vending machine" );
         this.terminal.flush();
         this.screen.refresh();
-
         this.textGUI.waitForWindowToClose( this.window );
+
         // Print the main menu
         this.initialStartupMode();
     }
 
+    /**
+     * This mode enables the user to select between maintainers mode and the
+     * beverage ordering mode.
+     */
     public void initialStartupMode()
     {
-        new ActionListDialogBuilder()
-                .setTitle( "==[ Coffee vending machine ]==" )
-                .setDescription( "Please choose one of the following actions:" )
-                .addAction( "Order a beverage.", this::orderBeverageMode )
-                .addAction( "Maintainers mode.", this::maintainersMode )
-                .addAction( "Reboot (Data will be wiped)", this::reboot )
-                .addAction( "Shutdown (exit the simulator)", this::shutdown )
-                .build()
-            .showDialog( this.textGUI );
-        /*
-
-        // Look in the inventory for available beverages and print a menu for the user.
-        List<Beverage> beverges = this.inventory.getBeverage();
-        for ( int i = 0, beverageSize = beverges.size(); i < beverageSize; i++ )
-        {
-            out.format( MENU_OPT_FORMAT, i, beverges.get( i ).getName() );
-        }
-
-        // Add an method to exit or enter maintenance mode.
-        out.format( "%1$s%nType m for maintainable mode or q to exit.%n%1$s", MENU_FOOT_FORMAT );
-
-        String answer = bufferedReader.readLine();
-
-        // The user choose to quit the program so set the exit signal.
-        if ( answer.contains( "q" ) )
-        {
-            this.exitSignal = true;
-            return;
-        }
-
-        // The user wants to access maintainer mode.
-        if ( answer.contains( "m" ) )
-        {
-            // todo write maintainer mode.
-        }
-
-        try
-        {
-            Integer chosenMenuIndex = Integer.parseInt( answer );
-            // todo Check if the index exists.
-            // todo call make beverage with the name of the beverage to make
-        }
-        catch ( NumberFormatException ex )
-        {
-
-        }*/
+        new ActionListDialogBuilder().setTitle( "==[ Coffee vending machine ]==" )
+                                     .setDescription( "Please choose one of the following actions:" )
+                                     .setCloseAutomaticallyOnAction( true )
+                                     .setCanCancel( false )
+                                     .addAction( "Order a beverage.", this::orderBeverageMode )
+                                     .addAction( "Maintainers mode.", this::maintainersMode )
+                                     .build()
+                                     .showDialog( this.textGUI );
     }
 
+    /**
+     * This mode enables the vending machine maintainers to add new products,
+     * resupply, reconfigure, reboot or shutdown the machine.
+     */
     public void maintainersMode()
     {
-
+        new ActionListDialogBuilder().setTitle( "==[ Maintainers Mode ]==" )
+                                     .setDescription( "Please choose one of the following actions:" )
+                                     .setCloseAutomaticallyOnAction( true )
+                                     .addAction( "Add new inventory.", this::addInventory )
+                                     .addAction( "Resupply new inventory.", this::maintainersMode )
+                                     .addAction( "Reboot", this::reboot )
+                                     .addAction( "Shutdown (exit the simulator)", this::shutdown )
+                                     .build()
+                                     .showDialog( this.textGUI );
     }
 
+    /**
+     * Creates an action menu for selecting a available beverage.
+     */
     public void orderBeverageMode()
     {
-        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder()
-                .setTitle( "==[ Order A Beverage ]==" )
-                .setDescription( "Please select the beverage you want to order:" );
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
 
         for ( Beverage beverage : this.inventory.getBeverages() )
         {
             menuBuilder.addAction( beverage.getName(), () -> this.orderProduct( beverage ) );
         }
-        menuBuilder.build().showDialog( this.textGUI );
+        menuBuilder.setTitle( "==[ Order A Beverage ]==" )
+                   .setDescription( "Please select the beverage you want to order:" )
+                   .setCloseAutomaticallyOnAction( true )
+                   .build()
+                   .showDialog( this.textGUI );
     }
 
-    public void beverageAdditionsMode( Product ofProduct )
+    /**
+     * Creates an action menu for available beverage additions, for the previously
+     * chosen beverage.
+     *
+     * @param forProduct The product to add the ingredients to.
+     */
+    public void beverageAdditionsMode( Beverage forProduct )
     {
-        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder()
-                .setTitle( "==[ Beverage Customization ]==" )
-                .setDescription( "Add to your beverage:" );
+        ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
 
-        for ( Addition addition : this.inventory.getAdditions() )
+        for ( Addition addition : this.inventory.getAdditions( forProduct ) )
         {
             menuBuilder.addAction( addition.getName(), () -> this.orderProduct( addition ) );
         }
+        menuBuilder.setTitle( "==[ Beverage Customization ]==" )
+                   .setDescription( "Add to your beverage:" )
+                   .addAction( "Go back to the previous menu", this::initialStartupMode )
+                   .build()
+                   .showDialog( this.textGUI );
+    }
 
-        menuBuilder.build().showDialog( this.textGUI );
+    /**
+     * Prints a product list of all products so the maintainer can choose what
+     * products he wants to refill.
+     */
+    public void selectInventoryToAddMode()
+    {
+
     }
 
     /**
@@ -367,7 +367,6 @@ public class CoffeeVendingMachine
 
         //todo subtract from inventory
     }
-
 
 
     public void addInventory( Orderable product, Integer amount )
