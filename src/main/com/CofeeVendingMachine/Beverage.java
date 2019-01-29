@@ -110,12 +110,12 @@ public class Beverage extends Product implements Orderable
     @Override
     public String getName()
     {
-        String fullName = this.name;
+        return this.name;
 
-        return this.name + " " + this.getAdditions().stream()
+       /* return this.name + " " + this.getAdditions().stream()
                                      .map( Product::getName )
                                      .distinct()
-                                     .collect( Collectors.joining() );
+                                     .collect( Collectors.joining() );*/
     }
 
     @Override

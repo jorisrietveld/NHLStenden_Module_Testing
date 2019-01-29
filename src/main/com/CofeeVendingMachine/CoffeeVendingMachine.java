@@ -94,10 +94,10 @@ public class CoffeeVendingMachine
 
         inv.put( beverageBuilder.setName( "Cappucino" )
                                 .setPrice( "0.01" )
-                                .addAvailableAddition( sugar )
                                 .build(), Beverage.MAX_QUANTITY );
 
         inv.put( beverageBuilder.setName( "ChocolateMilk" )
+                                .addAvailableAdditions( sugar, milk )
                                 .setPrice( BigDecimal.ONE )
                                 .build(), Beverage.MAX_QUANTITY );
 
@@ -106,12 +106,10 @@ public class CoffeeVendingMachine
                                 .build(), Beverage.MAX_QUANTITY );
 
         inv.put( beverageBuilder.setName( "IrishCoffee" )
-                                .addAvailableAddition( sugar )
                                 .setPrice( BigDecimal.ZERO )
                                 .build(), Beverage.MAX_QUANTITY );
 
         inv.put( beverageBuilder.setName( "LatteMachiatto" )
-                                .addAvailableAdditions( milk, sugar )
                                 .setPrice( "1.77" )
                                 .build(), Beverage.MAX_QUANTITY );
 
@@ -395,7 +393,7 @@ public class CoffeeVendingMachine
     {
         ActionListDialogBuilder menuBuilder = new ActionListDialogBuilder();
 
-        menuBuilder.addAction( "little amount",
+        menuBuilder.addAction( "small amount",
                 () -> this.beverageAdditionsMode( beverageBuilder.updateAddition( beverage, Addition.updateQuantity( addition, 1 ) ).build() ) );
 
         menuBuilder.addAction( "normal amount",
@@ -477,10 +475,20 @@ public class CoffeeVendingMachine
         if ( method.isAvailable() )
         {
             this.notifyMessage( String.format(
-                    "Done your: %s will be ready shortly %n You payed: %d euro using %s.",
+                    "Done your: %s will be ready shortly %n You payed: %d euro using %s. %n Please wait...",
                     beverage.getName(),
                     beverage.getPrice().intValue(),
                     method.toString() ) );
+            try
+            {
+                Thread.sleep( 2000 );
+                this.notifyMessage( "Your beverage is ready." );
+            }
+            catch ( InterruptedException ex )
+            {
+                ex.printStackTrace();
+            }
+
         }
         else
         {
@@ -497,7 +505,7 @@ public class CoffeeVendingMachine
         {
             menuBuilder.addAction(
                     method.isDisabled() ? "Enable" : "Disable" + " payment method: " + method.toString(),
-                    () -> disablePaymentMethodMode(method));
+                    () -> disablePaymentMethodMode( method ) );
         }
         menuBuilder.setTitle( "==[ Payment Selection ]==" )
                    .setDescription( "Select the payment method:" )
@@ -507,7 +515,7 @@ public class CoffeeVendingMachine
                    .showDialog( this.textGUI );
     }
 
-    public void disablePaymentMethodMode(Payable paymentMethod)
+    public void disablePaymentMethodMode( Payable paymentMethod )
     {
         paymentMethod.toggleMethod();
 
